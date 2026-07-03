@@ -1,1 +1,9 @@
-env
+env/
+
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+requirements.txt
+dist/
+.env
