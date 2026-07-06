@@ -3,7 +3,6 @@ from database.models import ( Student, Embedding, Attendance )
 
 def create_student(db: Session, data):
 	student = Student(**data)
-
 	db.add(student)
 	db.commit()
 	db.refresh(student)
