@@ -4,6 +4,9 @@ env/
 node_modules/
 /.pnp
 .pnp.js
-requirements.txt
 dist/
 .env
+test.py
+test_crud.py
+uploads
+.vscode
