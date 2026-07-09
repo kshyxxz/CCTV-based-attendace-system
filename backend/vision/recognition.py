@@ -1,31 +1,58 @@
-import cv2
-from backend.vision.camera import open_camera
-from backend.vision.mtcnn_detector import detect_faces
-from backend.vision.preprocessing import preprocess_face
-from backend.vision.facenet import get_embedding
-from backend.vision.embedding import compare_embeddings
+import numpy as np
+from preprocessing import preprocess_face
+from facenet import load_facenet, get_embedding
 
-def recognize_from_camera(source="Data/vd01.mp4"):
-    cap = open_camera(source)
-    frame_count = 0
+def cosine_similarity(vec1, vec2):
 
-    while True:
-        success, frame = cap.read()
-        if not success:
-            print("No more frames or cannot open source.")
-            break
+	"""
+	Returns:
+		float: Cosine similarity between vec1 and vec2.
+	"""
 
-        frame_count += 1
-        faces = detect_faces(frame)
+	dot_product = np.dot(vec1, vec2)
+	norm_vec1 = np.linalg.norm(vec1)
+	norm_vec2 = np.linalg.norm(vec2)
+	
+	if norm_vec1 == 0 or norm_vec2 == 0:
+		return 0.0
+	
+	return dot_product / (norm_vec1 * norm_vec2)
 
-        for face in faces:
-            processed = preprocess_face(face)
-            embedding = get_embedding(processed)
+def find_best_match(embedding, known_embeddings, threshold=0.8):
+	best_match = None
+	best_similarity = -1.0
 
-            print(f"Frame {frame_count} processed, embedding length: {len(embedding)}")
-            yield embedding
+	for known_embedding in known_embeddings:
+		similarity = cosine_similarity(embedding, known_embedding)
+		if similarity > best_similarity and similarity >= threshold:
+			best_similarity = similarity
+			best_match = known_embedding
 
-        if frame_count >= 20:  # stop after 20 frames for testing
-            break
+	return best_match, best_similarity
 
-    cap.release()
+def recognize_frame(frame, known_embeddings):
+
+	"""
+	Returns:
+		list: A list of recognized faces and their corresponding similarity scores.
+	"""
+
+	if frame is None or known_embeddings is None:
+		return []
+
+	preprocessed_frame = preprocess_face(frame)
+	if preprocessed_frame is None:
+		return []
+
+	facenet = load_facenet()
+	frame_embedding = get_embedding(facenet, preprocessed_frame)
+
+	if frame_embedding is None:
+		return []
+
+	best_match, best_similarity = find_best_match(frame_embedding, known_embeddings)
+
+	if best_match is not None:
+		return [(best_match, best_similarity)]
+	else:
+		return []
