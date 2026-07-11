@@ -1,6 +1,6 @@
 import numpy as np
-from preprocessing import preprocess_face
-from facenet import load_facenet, get_embedding
+from vision.preprocessing import preprocess_face
+from vision.facenet import load_facenet, get_embedding
 
 def cosine_similarity(vec1, vec2):
 
@@ -19,16 +19,20 @@ def cosine_similarity(vec1, vec2):
 	return dot_product / (norm_vec1 * norm_vec2)
 
 def find_best_match(embedding, known_embeddings, threshold=0.8):
-	best_match = None
-	best_similarity = -1.0
+    best_index = -1
+    best_similarity = -1.0
 
-	for known_embedding in known_embeddings:
-		similarity = cosine_similarity(embedding, known_embedding)
-		if similarity > best_similarity and similarity >= threshold:
-			best_similarity = similarity
-			best_match = known_embedding
+    for i, known_embedding in enumerate(known_embeddings):
+        similarity = cosine_similarity(embedding, known_embedding)
 
-	return best_match, best_similarity
+        if similarity > best_similarity:
+            best_similarity = similarity
+            best_index = i
+
+    if best_similarity >= threshold:
+        return best_index, best_similarity
+
+    return -1, best_similarity	
 
 def recognize_frame(frame, known_embeddings):
 

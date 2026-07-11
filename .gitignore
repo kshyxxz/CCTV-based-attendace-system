@@ -9,4 +9,8 @@ dist/
 test.py
 test_crud.py
 uploads
+embeddings
 .vscode
+__pycache__
+try1.py
+try2.py
