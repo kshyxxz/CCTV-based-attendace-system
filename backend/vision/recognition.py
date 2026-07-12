@@ -34,29 +34,29 @@ def find_best_match(embedding, known_embeddings, threshold=0.8):
 
     return -1, best_similarity	
 
-def recognize_frame(frame, known_embeddings):
+# def recognize_frame(frame, known_embeddings):
 
-	"""
-	Returns:
-		list: A list of recognized faces and their corresponding similarity scores.
-	"""
+# 	"""
+# 	Returns:
+# 		list: A list of recognized faces and their corresponding similarity scores.
+# 	"""
 
-	if frame is None or known_embeddings is None:
-		return []
+# 	if frame is None or known_embeddings is None:
+# 		return []
 
-	preprocessed_frame = preprocess_face(frame)
-	if preprocessed_frame is None:
-		return []
+# 	preprocessed_frame = preprocess_face(frame)
+# 	if preprocessed_frame is None:
+# 		return []
 
-	facenet = load_facenet()
-	frame_embedding = get_embedding(facenet, preprocessed_frame)
+# 	facenet = load_facenet()
+# 	frame_embedding = get_embedding(facenet, preprocessed_frame)
 
-	if frame_embedding is None:
-		return []
+# 	if frame_embedding is None:
+# 		return []
 
-	best_match, best_similarity = find_best_match(frame_embedding, known_embeddings)
+# 	best_match, best_similarity = find_best_match(frame_embedding, known_embeddings)
 
-	if best_match is not None:
-		return [(best_match, best_similarity)]
-	else:
-		return []
+# 	if best_match is not None:
+# 		return [(best_match, best_similarity)]
+# 	else:
+# 		return []

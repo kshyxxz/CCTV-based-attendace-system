@@ -5,29 +5,17 @@ import numpy as np
 
 facenet = load_facenet()
 
-def generate_embedding_for_one(face):
+def generate_embedding_for_one(facenet, face):
 
-	"""
-	Returns:
-		np.ndarray: The generated embedding as a NumPy array.
-	"""
-
-	preprocessed_face = preprocess_face(face)
-	embedding = get_embedding(facenet, preprocessed_face)
+	embedding = get_embedding(facenet, face)
 
 	return embedding
 
-def generate_embedding_for_group(face_list):
-
-	"""
-	Returns:
-		np.ndarray: A list of generated embeddings as NumPy arrays.
-	"""
+def generate_embedding_for_group(facenet, face_list):
 
 	if not face_list:
-		return None
+		return []
 	
-	preprocessed_faces = [preprocess_face(face) for face in face_list]
-	embeddings = [generate_embedding_for_one(preprocessed_face) for preprocessed_face in preprocessed_faces]
+	embeddings = [generate_embedding_for_one(facenet, face) for face in face_list]
 
 	return embeddings
