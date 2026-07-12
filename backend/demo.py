@@ -1,11 +1,13 @@
 import cv2
-import time
 import numpy as np
 
 from pathlib import Path
-from vision.facenet import load_facenet
+from vision.camera import extract_frame,  load_camera
 from vision.mtcnn_detector import detect_faces, extract_face, load_detector
-from vision.embedding import generate_embedding_for_one
+from vision.facenet import load_facenet
+from vision.embedding import generate_embedding_for_one, generate_embedding_for_group
+from vision.recognition import find_best_match
+from config import INTERVAL, THRESHOLD, FACE_CONFIDENCE
 
 def registration_service():
 
@@ -13,7 +15,7 @@ def registration_service():
 	embeddings_dir = Path("database") / "embeddings"
 
 	detector = load_detector()
-	facenet = load_facenet()
+	generator = load_facenet()
 
 	saved_embeddings = []
 
@@ -27,6 +29,7 @@ def registration_service():
 
 		resized_img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
 		faces = detect_faces(detector, resized_img)
+
 		"""
 		[
 			{
@@ -65,16 +68,21 @@ def registration_service():
 		]
 		"""
 		
+		if not faces:
+			continue
+
 		largest_face = max(faces, key=lambda face: face["box"][2] * face["box"][3])
 		
 		cropped_face = extract_face(resized_img, largest_face["box"])
 
-		# cv2.imshow(f"Detected Face - {image_name}", cropped_face)
-
 		if cropped_face.size == 0:
 			continue
 
-		embedding = generate_embedding_for_one(cropped_face)
+		cv2.imshow(image_name, cropped_face)
+		cv2.waitKey(0)
+		cv2.destroyAllWindows()
+
+		embedding = generate_embedding_for_one(generator, cropped_face)
 
 		if embedding is None:
 			continue
@@ -89,18 +97,7 @@ def registration_service():
 		)
 		print(f"Saved embedding for {image_path.name} at {embedding_path}")
 
-	# cv2.waitKey(0)
-	# cv2.destroyAllWindows()
 	return saved_embeddings
-	
-# registration_service()
-
-from config import INTERVAL, THRESHOLD, FACE_CONFIDENCE
-from vision.mtcnn_detector import load_detector, extract_face
-from vision.camera import extract_frame
-from vision.camera import load_camera
-from vision.facenet import load_facenet
-from vision.embedding import generate_embedding_for_group
 
 def recognition_service():
 
@@ -109,19 +106,64 @@ def recognition_service():
 
 	cap = load_camera(0)
 
-	cropped_faces = []
+	embeddings_dir = Path("database") / "embeddings"
+
+	embedding_paths = sorted(embeddings_dir.glob("*.npy"))
+
+	loaded_embeddings = [np.load(str(path)) for path in embedding_paths]
 
 	for frame in extract_frame(cap, INTERVAL):
+
+		cropped_faces = []
+
+		matches = []
 
 		faces = detect_faces(detector, frame)
 
 		for face in faces:
-			if face["confidence"] < THRESHOLD:
+			if face["confidence"] < FACE_CONFIDENCE:
 				continue
 
 			cropped_face = extract_face(frame, face["box"])
 			cropped_faces.append(cropped_face)
 
-		embeddings = generate_embedding_for_group(cropped_faces)
+		if not cropped_faces:
+			continue
 
-		
+		embeddings = generate_embedding_for_group(generator, cropped_faces)
+
+		for embedding in embeddings:
+			if embedding is None:
+				continue
+
+			
+			index, similarity = find_best_match(embedding, loaded_embeddings, THRESHOLD)
+
+			if index != -1:   # assuming -1 means "no match"
+				student_name = embedding_paths[index].stem
+			else:
+				student_name = "Unknown"
+
+			matches.append(
+				{
+					"student": student_name,
+					"embedding_index": index,
+					"similarity": similarity,
+				}
+			)
+
+		for match in matches:
+			print(match["student"])
+
+while True:
+    input_choice = input("Enter 'r' for registration or 'c' for recognition ('e' to exit): ").strip().lower()
+
+    if input_choice == 'r':
+        registration_service()
+    elif input_choice == 'c':
+        recognition_service()
+    elif input_choice == 'e':
+        print("Exiting...")
+        break
+    else:
+        print("Invalid choice. Please try again.")
