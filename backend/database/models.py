@@ -19,7 +19,7 @@ class Embedding(Base):
 	__tablename__ = "embeddings"
 
 	rollno = Column(String(20), ForeignKey("student.rollno"), primary_key=True)
-	embedding = Column(Vector(128), nullable=False)
+	embedding = Column(Vector(512), nullable=False)
 
 	student = relationship("Student", back_populates="embedding")
 
