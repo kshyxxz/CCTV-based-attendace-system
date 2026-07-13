@@ -30,16 +30,16 @@ def extract_frame(cap, interval_seconds=1):
         if not ret:
             break
 
-        # Always display the live camera
+        # Yield only every Nth frame for recognition
+        if frame_count % frame_interval == 0:
+            yield frame
+            
+		# Always display the live camera
         cv2.imshow("Camera", frame)
 
         # Exit if user presses q
         if stop_camera():
             break
-
-        # Yield only every Nth frame for recognition
-        if frame_count % frame_interval == 0:
-            yield frame
 
         frame_count += 1
     release_camera(cap)

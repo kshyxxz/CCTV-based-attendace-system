@@ -1,5 +1,4 @@
 import numpy as np
-from vision.preprocessing import preprocess_face
 from vision.facenet import load_facenet, get_embedding
 
 def cosine_similarity(vec1, vec2):
@@ -44,12 +43,8 @@ def find_best_match(embedding, known_embeddings, threshold=0.8):
 # 	if frame is None or known_embeddings is None:
 # 		return []
 
-# 	preprocessed_frame = preprocess_face(frame)
-# 	if preprocessed_frame is None:
-# 		return []
-
 # 	facenet = load_facenet()
-# 	frame_embedding = get_embedding(facenet, preprocessed_frame)
+# 	frame_embedding = get_embedding(facenet, frame)
 
 # 	if frame_embedding is None:
 # 		return []

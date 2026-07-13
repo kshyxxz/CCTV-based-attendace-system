@@ -1,5 +1,4 @@
 from config import FACE_SIZE, EMBEDDING_DIMENSION
-from vision.preprocessing import preprocess_face
 from vision.facenet import load_facenet, get_embedding
 import numpy as np
 
