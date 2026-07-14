@@ -1,0 +1,22 @@
+/* APPLICATION MASTER WRAPPER */
+.sidebar-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #f3f4f6;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  overflow: hidden;
+}
+
+/* MAIN CONTENT WORKSPACE VIEWPORT */
+.dashboard-main {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #f8fafc;
+  padding: 40px;
+  box-sizing: border-box;
+}
