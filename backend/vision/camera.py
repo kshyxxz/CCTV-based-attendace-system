@@ -34,6 +34,7 @@ def extract_frame(cap, interval_seconds=1):
         if frame_count % frame_interval == 0:
             yield frame
             
+        frame = cv2.resize(frame, (640, 480))  # Resize the frame to a standard size for display
 		# Always display the live camera
         cv2.imshow("Camera", frame)
 
