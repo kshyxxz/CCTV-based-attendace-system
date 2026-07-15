@@ -147,3 +147,19 @@
   background-color: #f8fafc;
   color: #0f172a;
 }
+/* Push the logout link to the bottom of the navigation area if using flexbox */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ensure the nav takes up the remaining vertical space */
+}
+
+.logout-link {
+  margin-top: auto; /* This magic trick pushes the logout button to the absolute bottom */
+  color: #ff4d4d; /* Optional: Gives it a subtle red color indicating action */
+}
+
+.logout-link:hover {
+  background-color: rgba(255, 77, 77, 0.1); /* Soft red hover effect */
+  color: #ff3333;
+}

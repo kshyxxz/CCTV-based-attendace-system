@@ -8,13 +8,7 @@ export default function StudentDetails({ student, onBack }) {
       </button>
       <h2>Detailed View: {student.name}</h2>
       <p>
-        <strong>Email:</strong> {student.email}
-      </p>
-      <p>
-        <strong>Department:</strong> {student.dept}
-      </p>
-      <p>
-        <strong>Semester:</strong> {student.sem}
+        <strong>Address:</strong> {student.address}
       </p>
       <p>
         <strong>Phone:</strong> {student.phone}
