@@ -5,19 +5,22 @@ from vision.embedding import generate_embedding_for_group
 from vision.recognition import find_best_match
 from database.crud import get_all_embeddings
 from database.database import get_db
+from services.attendence_service import attendance_service
 from config import INTERVAL, THRESHOLD, FACE_CONFIDENCE
 
-def recognition_service():
+def recognition_service(class_name):
 
     detector = load_detector()
     generator = load_facenet()
 
     db = next(get_db())
-
-    cap = load_video("uploads/cctv_demo.mp4")
+    
+    cap = load_video(f"uploads/{class_name}.mp4")
+    # cap = load_video("uploads/cctv_demo.mp4")
     # cap = load_camera(0)
 
-    loaded_embeddings = get_all_embeddings(db)
+    #TODO: load embedding of that class only
+    loaded_embeddings = get_all_embeddings(db, class_name)
 
     roll_numbers = [item.rollno for item in loaded_embeddings]
     stored_embeddings = [item.embedding for item in loaded_embeddings]
@@ -74,3 +77,5 @@ def recognition_service():
 
         for match in matches:
             print(match["student"])
+            
+        attendance_service(db, matched_students)
