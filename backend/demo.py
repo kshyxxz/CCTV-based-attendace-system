@@ -7,7 +7,8 @@ while True:
     if input_choice == 'r':
         registration_service()
     elif input_choice == 'c':
-        recognition_service()
+        class_name = input("Enter the class name: ")
+        recognition_service(class_name)
     elif input_choice == 'e':
         print("Exiting...")
         break
