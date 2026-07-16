@@ -4,7 +4,8 @@ import Login from "../features/auth/Login";
 import Students from "../features/Students/Students"; // <-- Add this import statement right here
 import Dashboard from "../features/dashboard/Dashboard";
 import DashboardLayout from "../layouts/DashboardLayout";
-
+import LiveRecognition from "../features/recognition/LiveRecognition";
+import Attendance from "../features/attendance/Attendance";
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -19,6 +20,8 @@ export default function AppRoutes() {
           {/* REPLACED PLACEHOLDER: Wired directly into your core features module */}
           <Route path="/students" element={<Students />} />
 
+          <Route path="/recognition" element={<LiveRecognition />} />
+          <Route path="/attendance" element={<Attendance />} />
           {/* Remaining sub-features placeholders */}
           <Route
             path="/live-attendance"

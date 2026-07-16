@@ -7,7 +7,7 @@ export default function StudentForm({ onClose, refreshStudents, apiUrl }) {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "",
+    address: "",
     rollNo: "",
     phone: "",
   });
@@ -96,13 +96,13 @@ export default function StudentForm({ onClose, refreshStudents, apiUrl }) {
           </div>
 
           <div className="form-group">
-            <label>Email Address</label>
+            <label>Address</label>
             <input
-              type="email"
-              name="email"
+              type="test"
+              name="address"
               required
-              placeholder="arjunsharma@gmail.com"
-              value={formData.email}
+              placeholder="talchikhel,lalitpur"
+              value={formData.address}
               onChange={handleInputChange}
             />
           </div>

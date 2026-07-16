@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
+  LogOut,
 } from "lucide-react";
 import "./Sidebar.css";
 
@@ -15,7 +16,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
   const navItems = [
     { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
     { name: "Students", icon: Users, path: "/students" },
-    { name: "Live Attendance", icon: Camera, path: "/live-attendance" },
+    { name: "Live Attendance", icon: Camera, path: "/recognition" },
     { name: "Attendance", icon: FileText, path: "/attendance" },
   ];
 
@@ -58,6 +59,22 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
             </NavLink>
           );
         })}
+
+        {/* 2. Added Logout Section at the bottom of the nav */}
+        <NavLink
+          to="/login"
+          className={({ isActive }) =>
+            `sidebar-link logout-link ${isActive ? "active" : "inactive"}`
+          }
+        >
+          <div className="sidebar-icon">
+            <LogOut size={20} strokeWidth={2} />
+          </div>
+
+          {!isCollapsed && <span className="sidebar-label">Logout</span>}
+
+          {isCollapsed && <div className="sidebar-tooltip">Logout</div>}
+        </NavLink>
       </nav>
 
       <button

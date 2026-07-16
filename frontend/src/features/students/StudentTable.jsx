@@ -38,10 +38,10 @@ export default function StudentTable({ filteredStudents }) {
                   </div>
                 </td>
                 <td className="text-muted">{student.rollNo}</td>
-                <td>
+                {/* <td>
                   <div className="dept-text">{student.dept}</div>
                   <div className="sem-text text-muted">{student.sem}</div>
-                </td>
+                </td> */}
                 <td className="text-muted">{student.phone}</td>
                 <td>
                   <span
