@@ -1,6 +1,5 @@
 import numpy as np
-from preprocessing import preprocess_face
-from facenet import load_facenet, get_embedding
+from vision.facenet import load_facenet, get_embedding
 
 def cosine_similarity(vec1, vec2):
 
@@ -19,40 +18,40 @@ def cosine_similarity(vec1, vec2):
 	return dot_product / (norm_vec1 * norm_vec2)
 
 def find_best_match(embedding, known_embeddings, threshold=0.8):
-	best_match = None
-	best_similarity = -1.0
+    best_index = -1
+    best_similarity = -1.0
 
-	for known_embedding in known_embeddings:
-		similarity = cosine_similarity(embedding, known_embedding)
-		if similarity > best_similarity and similarity >= threshold:
-			best_similarity = similarity
-			best_match = known_embedding
+    for i, known_embedding in enumerate(known_embeddings):
+        similarity = cosine_similarity(embedding, known_embedding)
 
-	return best_match, best_similarity
+        if similarity > best_similarity:
+            best_similarity = similarity
+            best_index = i
 
-def recognize_frame(frame, known_embeddings):
+    if best_similarity >= threshold:
+        return best_index, best_similarity
 
-	"""
-	Returns:
-		list: A list of recognized faces and their corresponding similarity scores.
-	"""
+    return -1, best_similarity	
 
-	if frame is None or known_embeddings is None:
-		return []
+# def recognize_frame(frame, known_embeddings):
 
-	preprocessed_frame = preprocess_face(frame)
-	if preprocessed_frame is None:
-		return []
+# 	"""
+# 	Returns:
+# 		list: A list of recognized faces and their corresponding similarity scores.
+# 	"""
 
-	facenet = load_facenet()
-	frame_embedding = get_embedding(facenet, preprocessed_frame)
+# 	if frame is None or known_embeddings is None:
+# 		return []
 
-	if frame_embedding is None:
-		return []
+# 	facenet = load_facenet()
+# 	frame_embedding = get_embedding(facenet, frame)
 
-	best_match, best_similarity = find_best_match(frame_embedding, known_embeddings)
+# 	if frame_embedding is None:
+# 		return []
 
-	if best_match is not None:
-		return [(best_match, best_similarity)]
-	else:
-		return []
+# 	best_match, best_similarity = find_best_match(frame_embedding, known_embeddings)
+
+# 	if best_match is not None:
+# 		return [(best_match, best_similarity)]
+# 	else:
+# 		return []

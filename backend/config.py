@@ -18,9 +18,16 @@ CAMERA_FPS = int(os.getenv("CAMERA_FPS", 30))
 
 FACE_SIZE = (160, 160)
 FRAME_SKIP = int(os.getenv("FRAME_SKIP", 5))
-MAX_EMBEDDINGS = int(os.getenv("MAX_EMBEDDINGS", 100))
+
+INTERVAL = int(os.getenv("INTERVAL", 5))	# in seconds
+
+THRESHOLD = float(os.getenv("THRESHOLD", 0.6))
 FACE_CONFIDENCE = float(os.getenv("FACE_CONFIDENCE", 0.9))
-EMBEDDING_DIMENSION = int(os.getenv("EMBEDDING_DIMENSION", 128))
-BLUR_THRESHOLD = float(os.getenv("BLUR_THRESHOLD", 100.0))
-DARK_THRESHOLD = float(os.getenv("DARK_THRESHOLD", 40.0))
-BRIGHT_THRESHOLD = float(os.getenv("BRIGHT_THRESHOLD", 220.0))
+
+# MAX_EMBEDDINGS = int(os.getenv("MAX_EMBEDDINGS", 100))
+
+EMBEDDING_DIMENSION = int(os.getenv("EMBEDDING_DIMENSION", 512))
+
+# BLUR_THRESHOLD = float(os.getenv("BLUR_THRESHOLD", 100.0))
+# DARK_THRESHOLD = float(os.getenv("DARK_THRESHOLD", 40.0))
+# BRIGHT_THRESHOLD = float(os.getenv("BRIGHT_THRESHOLD", 220.0))

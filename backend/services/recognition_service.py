@@ -1,61 +1,66 @@
-# backend/services/recognition_service.py
+from vision.camera import extract_frame, load_video, load_camera
+from vision.mtcnn_detector import detect_faces, extract_face, load_detector
+from vision.facenet import load_facenet
+from vision.embedding import generate_embedding_for_group
+from vision.recognition import find_best_match
+from database.crud import get_all_embeddings
+from database.database import get_db
+from config import INTERVAL, THRESHOLD, FACE_CONFIDENCE
 
-import numpy as np
-from backend.vision.recognition import recognize_frame
-from backend.database.models import Embedding, Student
-from backend.database.database import SessionLocal
+def recognition_service():
 
+	detector = load_detector()
+	generator = load_facenet()
 
-def cosine_similarity(vec1, vec2):
-    """Compute cosine similarity between two vectors."""
-    dot_product = np.dot(vec1, vec2)
-    norm_vec1 = np.linalg.norm(vec1)
-    norm_vec2 = np.linalg.norm(vec2)
+	db = next(get_db())
 
-    if norm_vec1 == 0 or norm_vec2 == 0:
-        return 0.0
+	# cap = load_video("uploads/kishanvid.mp4")  
+	cap = load_camera(0)  
 
-    return dot_product / (norm_vec1 * norm_vec2)
+	loaded_embeddings = get_all_embeddings(db)
 
+	roll_numbers = [item.rollno for item in loaded_embeddings]
+	stored_embeddings = [item.embedding for item in loaded_embeddings]
 
-def find_student(embedding, threshold=0.8):
-    """
-    Compare embedding with stored embeddings using cosine similarity.
-    Returns (Student, similarity) if match found, else (None, None).
-    """
-    db = SessionLocal()
-    try:
-        stored_embeddings = db.query(Embedding).all()
-        best_similarity = -1.0
-        matched_rollno = None
+	for frame in extract_frame(cap, INTERVAL):
 
-        for emb in stored_embeddings:
-            sim = cosine_similarity(embedding, emb.embedding)
-            if sim > best_similarity and sim >= threshold:
-                best_similarity = sim
-                matched_rollno = emb.rollno
+		cropped_faces = []
 
-        if matched_rollno:
-            student = db.query(Student).filter_by(rollno=matched_rollno).first()
-            return student, best_similarity
+		matches = []
 
-        return None, None
-    finally:
-        db.close()
+		faces = detect_faces(detector, frame)
 
+		for face in faces:
+			if face["confidence"] < FACE_CONFIDENCE:
+				continue
 
-def recognize_attendance(frame, threshold=0.8):
-    """
-    Recognize student from a CCTV frame.
-    Returns (Student, similarity) if recognized, else (None, None).
-    """
-    embeddings = recognize_frame(frame, [])
-    if not embeddings:
-        return None, None
+			cropped_face = extract_face(frame, face["box"])
+			cropped_faces.append(cropped_face)
 
-    embedding, _ = embeddings[0]
-    return find_student(embedding, threshold)
+		if not cropped_faces:
+			continue
 
+		embeddings = generate_embedding_for_group(generator, cropped_faces)
 
-if __name__ == "__main__":
-    print("Recognition service ready. Import and call recognize_attendance(frame) in your API.")
+		for embedding in embeddings:
+
+			if embedding is None:
+				continue
+
+			index, similarity = find_best_match(embedding, stored_embeddings, THRESHOLD)
+
+			if index != -1:   # assuming -1 means "no match"
+				student_roll_no = roll_numbers[index]
+			else:
+				student_roll_no = "Unknown"
+
+			matches.append(
+				{
+					"student": student_roll_no,
+					"embedding_index": index,
+					"similarity": similarity,
+				}
+			)
+
+		for match in matches:
+			print(match["student"])

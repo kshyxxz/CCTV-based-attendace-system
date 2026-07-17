@@ -12,11 +12,40 @@ def load_camera(camera_index=0):
 		raise ValueError(f"Unable to open camera with index {camera_index}")
 	return cap
 
-def get_frame(cap):
-	ret, frame = cap.read()
-	if not ret:
-		raise ValueError("Unable to read frame from video capture")
-	return frame
+def get_capture(cap):
+	return cap.read()
+
+def extract_frame(cap, interval_seconds=1):
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    # Some webcams return FPS = 0
+    if fps <= 0:
+        fps = 30
+
+    frame_interval = max(1, int(fps * interval_seconds))
+    frame_count = 0
+
+    while True:
+        ret, frame = get_capture(cap)
+        if not ret:
+            break
+
+        # Yield only every Nth frame for recognition
+        if frame_count % frame_interval == 0:
+            yield frame
+            
+		# Always display the live camera
+        cv2.imshow("Camera", frame)
+
+        # Exit if user presses q
+        if stop_camera():
+            break
+
+        frame_count += 1
+    release_camera(cap)
+
+def stop_camera(key='q'):
+    return cv2.waitKey(1) & 0xFF == ord(key)
 
 def release_camera(cap):
 	cap.release()
