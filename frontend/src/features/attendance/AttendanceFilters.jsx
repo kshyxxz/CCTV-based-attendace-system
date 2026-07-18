@@ -56,18 +56,6 @@ function AttendanceFilters({
         </select>
       </div>
 
-      {/* Main Search Input */}
-      <div className="filter-search-field">
-        <FaSearch className="field-search-icon" />
-        <input
-          type="text"
-          placeholder="Search by roll no or name..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-
-      {/* Search Button */}
       <button type="submit" className="btn-search-trigger">
         Search
       </button>

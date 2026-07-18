@@ -67,20 +67,6 @@
   font-size: 0.875rem;
 }
 
-/* .filter-group-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.filter-select {
-  padding: 8px 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  background-color: white;
-  color: #334155;
-  outline: none;
-} */
-
 .table-responsive {
   background: white;
   border-radius: 16px;
@@ -129,6 +115,52 @@
 .student-email {
   font-size: 0.75rem;
   color: #64748b;
+}
+/* Append these rules to the bottom of your Students.css file */
+
+.text-center {
+  text-align: center;
+}
+
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: #ef4444; /* Standard red-danger tone */
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-delete:hover {
+  background-color: #fee2e2; /* Smooth red background highlight on hover */
+  color: #b91c1c;
+  transform: scale(1.05);
+}
+/* Append these rules to the bottom of your Students.css file */
+
+.btn-edit {
+  background: transparent;
+  border: none;
+  color: #3b82f6; /* Accent primary blue */
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-edit:hover {
+  background-color: #dbeafe; /* Light blue highlight on hover */
+  color: #1d4ed8;
+  transform: scale(1.05);
 }
 
 /* Embed Badges Styles */

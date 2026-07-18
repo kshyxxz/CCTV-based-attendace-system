@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { FaTimes } from "react-icons/fa";
+// StudentForm.jsx
+import { useState, useEffect } from "react";
 import ImageUploader from "./ImageUploader";
+import { studentService } from "../../../services/studentServices";
 
-export default function StudentForm({ onClose, refreshStudents, apiUrl }) {
+export default function StudentForm({ studentData, onClose, refreshStudents }) {
   const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -11,6 +12,26 @@ export default function StudentForm({ onClose, refreshStudents, apiUrl }) {
     rollNo: "",
     phone: "",
   });
+
+  const isEditMode = !!studentData; // true if editing, false if creating a new student
+
+  // 1. Populate form fields if we are in Edit Mode
+  useEffect(() => {
+    if (studentData) {
+      // Split "First Last" safely back into individual inputs
+      const nameParts = (studentData.name || "").trim().split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || ""; // Handles multi-word last names
+
+      setFormData({
+        firstName,
+        lastName,
+        address: studentData.address || "",
+        rollNo: studentData.rollNo || "",
+        phone: studentData.phone || "",
+      });
+    }
+  }, [studentData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -22,33 +43,28 @@ export default function StudentForm({ onClose, refreshStudents, apiUrl }) {
     try {
       const studentPayload = {
         name: `${formData.firstName} ${formData.lastName}`.trim(),
-        email: formData.email,
+        email:
+          studentData?.email ||
+          `${formData.firstName.toLowerCase()}.${formData.lastName.toLowerCase()}@student.edu`,
         rollNo: formData.rollNo,
         phone: formData.phone,
-        embedding: "Pending",
-        attendance: 0,
+        address: formData.address,
+        embedding: studentData?.embedding || "Pending", // Keep old status if editing
+        attendance: studentData?.attendance || 0, // Keep old attendance rate if editing
       };
 
-      let bodyData;
-      let headers = {};
-
-      if (imageFile) {
-        const data = new FormData();
-        data.append("studentData", JSON.stringify(studentPayload));
-        data.append("avatar", imageFile);
-        bodyData = data;
+      if (isEditMode) {
+        // Use the PUT route targeting the unique id or roll number
+        const studentId = studentData.id || studentData.rollNo;
+        await studentService.updateStudent(
+          studentId,
+          studentPayload,
+          imageFile,
+        );
       } else {
-        bodyData = JSON.stringify(studentPayload);
-        headers["Content-Type"] = "application/json";
+        // Fallback to the standard POST route
+        await studentService.saveStudent(studentPayload, imageFile);
       }
-
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers: headers,
-        body: bodyData,
-      });
-
-      if (!response.ok) throw new Error("Failed to save student profile.");
 
       refreshStudents();
       onClose();
@@ -61,14 +77,14 @@ export default function StudentForm({ onClose, refreshStudents, apiUrl }) {
     <div className="modal-backdrop">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Add New Student</h2>
-          {/* <button className="btn-close" onClick={onClose}> */}
-          {/* <FaTimes /> */}
-          {/* </button> */}
+          <h2>{isEditMode ? "Edit Student Profile" : "Add New Student"}</h2>
         </div>
 
         <form onSubmit={handleFormSubmit} className="modal-form">
-          <ImageUploader onImageSelect={(file) => setImageFile(file)} />
+          <ImageUploader
+            onImageSelect={(file) => setImageFile(file)}
+            defaultImage={studentData?.avatar} // Optional: display existing avatar if your Uploader supports it
+          />
 
           <div className="form-row">
             <div className="form-group">
@@ -98,10 +114,10 @@ export default function StudentForm({ onClose, refreshStudents, apiUrl }) {
           <div className="form-group">
             <label>Address</label>
             <input
-              type="test"
+              type="text"
               name="address"
               required
-              placeholder="talchikhel,lalitpur"
+              placeholder="Talchikhel, Lalitpur"
               value={formData.address}
               onChange={handleInputChange}
             />
@@ -114,9 +130,11 @@ export default function StudentForm({ onClose, refreshStudents, apiUrl }) {
                 type="text"
                 name="rollNo"
                 required
+                disabled={isEditMode} // Roll Numbers shouldn't change during edits
                 placeholder="NCE080BCT018"
                 value={formData.rollNo}
                 onChange={handleInputChange}
+                style={{ backgroundColor: isEditMode ? "#f3f4f6" : "#ffffff" }}
               />
             </div>
             <div className="form-group">
@@ -132,38 +150,12 @@ export default function StudentForm({ onClose, refreshStudents, apiUrl }) {
             </div>
           </div>
 
-          {/* <div className="form-row">
-            <div className="form-group">
-              <label>Department</label>
-              <select
-                name="dept"
-                value={formData.dept}
-                onChange={handleInputChange}
-              >
-                <option value="Computer Engg">Computer Engg</option>
-                <option value="Electronics Engg">Electronics Engg</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label>Semester</label>
-              <select
-                name="sem"
-                value={formData.sem}
-                onChange={handleInputChange}
-              >
-                <option value="1st Semester">1st Semester</option>
-                <option value="2nd Semester">2nd Semester</option>
-                <option value="7th Semester">7th Semester</option>
-              </select>
-            </div>
-          </div> */}
-
           <div className="modal-actions">
             <button type="button" className="btn-cancel" onClick={onClose}>
               Cancel
             </button>
             <button type="submit" className="btn-submit">
-              Save Student
+              {isEditMode ? "Save Changes" : "Save Student"}
             </button>
           </div>
         </form>

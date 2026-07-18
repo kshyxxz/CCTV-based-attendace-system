@@ -1,6 +1,8 @@
+//Dashboard.jsx
 import { useState, useEffect } from "react";
 import DashboardCards from "./DashboardCards";
 import AttendanceChart from "./AttendanceChart";
+import { apiService } from "../../../services/api";
 import "./Dashboard.css";
 
 function Dashboard() {
@@ -21,32 +23,20 @@ function Dashboard() {
         setIsLoading(true);
         setApiError("");
 
-        const response = await fetch(
-          "http://localhost:5000/api/v1/dashboard-summary",
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Server returned error status code: ${response.status}`,
-          );
-        }
-
-        const data = await response.json();
+        // Call the centralized API client
+        const data = await apiService.getDashboardSummary();
+        console.log("Dashboard fetch result:", data);
 
         setStats({
-          totalStudents: data.stats.totalStudents || 0,
-          presentToday: data.stats.presentToday || 0,
-          attendanceRate: data.stats.attendanceRate || "0%",
-          totalRecords: data.stats.totalRecords || 0,
+          totalStudents: data.stats?.totalStudents || 0,
+          presentToday: data.stats?.presentToday || 0,
+          attendanceRate: data.stats?.attendanceRate || "0%",
+          totalRecords: data.stats?.totalRecords || 0,
         });
         setAttendanceRecords(data.recentAttendance || []);
         setChartMetrics(data.chartData || [0, 0, 0, 0, 0, 0]);
       } catch (error) {
-        console.error("REST API communication failed:", error);
+        console.error("API communication failed:", error);
         setApiError(
           "Failed to load dashboard data. Connecting to backend failed.",
         );

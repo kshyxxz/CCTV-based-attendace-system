@@ -1,6 +1,8 @@
+// StudentTable.jsx
 import React from "react";
+import { FaTrash, FaPencilAlt } from "react-icons/fa";
 
-export default function StudentTable({ filteredStudents }) {
+export default function StudentTable({ filteredStudents, onEdit, onDelete }) {
   return (
     <div className="table-responsive">
       <table className="student-table">
@@ -8,10 +10,10 @@ export default function StudentTable({ filteredStudents }) {
           <tr>
             <th>Student</th>
             <th>Roll No</th>
-            <th>Dept / Sem</th>
             <th>Phone</th>
             <th>Embedding</th>
             <th>Attendance</th>
+            <th className="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -38,10 +40,6 @@ export default function StudentTable({ filteredStudents }) {
                   </div>
                 </td>
                 <td className="text-muted">{student.rollNo}</td>
-                {/* <td>
-                  <div className="dept-text">{student.dept}</div>
-                  <div className="sem-text text-muted">{student.sem}</div>
-                </td> */}
                 <td className="text-muted">{student.phone}</td>
                 <td>
                   <span
@@ -62,6 +60,30 @@ export default function StudentTable({ filteredStudents }) {
                     <span className="attendance-percentage">
                       {student.attendance || 0}%
                     </span>
+                  </div>
+                </td>
+                <td className="text-center">
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <button
+                      className="btn-edit"
+                      onClick={() => onEdit(student)}
+                      title="Edit Student"
+                    >
+                      <FaPencilAlt />
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => onDelete(student.id || student.rollNo)}
+                      title="Delete Student"
+                    >
+                      <FaTrash />
+                    </button>
                   </div>
                 </td>
               </tr>
