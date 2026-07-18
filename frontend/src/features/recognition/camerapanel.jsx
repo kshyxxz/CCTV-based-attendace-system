@@ -1,55 +1,16 @@
-import { FaVideo, FaCamera, FaStop, FaRegDotCircle } from "react-icons/fa";
+// CameraPanel.jsx
+import { FaVideo, FaCamera, FaStop } from "react-icons/fa";
 
 function CameraPanel({
   isCameraActive,
-  selectedCamera,
-  setSelectedCamera,
-  selectedClass,
-  setSelectedClass,
   handleStartCamera,
+  handleCaptureSnapshot,
   stats,
 }) {
-  const handleCaptureSnapshot = async () => {
-    try {
-      // Example Endpoint: POST /api/camera/snapshot
-      // const response = await fetch('/api/camera/snapshot', { method: 'POST', body: JSON.stringify({ camera: selectedCamera }) });
-      // const blob = await response.blob();
-      alert("Snapshot event triggered and saved via API.");
-    } catch (error) {
-      console.error("Error capturing snapshot:", error);
-    }
-  };
-
   return (
     <div className="video-panel">
       <div className="controls-panel">
         <div className="controls-left">
-          <div className="control-select-group">
-            <FaVideo className="control-icon" />
-            <select
-              value={selectedCamera}
-              onChange={(e) => setSelectedCamera(e.target.value)}
-            >
-              <option value="Main Hall Cam 1">Main Hall Cam 1</option>
-              <option value="Main Hall Cam 2">Main Hall Cam 2</option>
-              <option value="Lab Room 3">Lab Room 3</option>
-            </select>
-          </div>
-
-          <div className="control-select-group">
-            <FaRegDotCircle className="control-icon" />
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-            >
-              <option value="AI & ML">AI & ML</option>
-              <option value="Computer Architecture">
-                Computer Architecture
-              </option>
-              <option value="Data Structures">Data Structures</option>
-            </select>
-          </div>
-
           <button
             className={`btn-action-trigger ${isCameraActive ? "btn-stop" : "btn-start"}`}
             onClick={handleStartCamera}
@@ -75,8 +36,6 @@ function CameraPanel({
             <div className="stream-live-indicator">
               <span className="live-dot"></span> LIVE
             </div>
-            {/* Direct your video feed source element here once streaming from API endpoints */}
-            {/* <img src={`/api/streams/feed?id=${selectedCamera}`} alt="Live Stream Container" /> */}
             <p>Receiving Real-Time CCTV Feed Stream...</p>
           </div>
         ) : (
