@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from database.database import SessionLocal
-from database.crud import (get_all_student, get_embedding_status, get_class_name, get_student, delete_student, create_student)
+from database.crud import (get_all_student, get_embedding_status, get_class_name, get_student, delete_student, create_student, get_class_id)
 
 student_bp = Blueprint("student", __name__)
 
@@ -12,7 +12,7 @@ def ret_students():
         students = get_all_student(db)
 
         if not students:
-            return jsonify({"message": "Empty"})
+            return jsonify({"message": "No students found!"})
 
         return jsonify([
             {
@@ -68,37 +68,48 @@ def add_student():
 
 		create_student(db, details)
 
-		return jsonify({"message": "Student(s) created successfully!"})
+		return jsonify({"message": "Student created successfully!"})
 	
 	except Exception as e:
 		return jsonify({"message": "An error occurred while creating the student."})
 
 @student_bp.route("/", methods=["PUT"])
 def update_student():
-	db = SessionLocal()
+    db = SessionLocal()
 
-	try:
-		details = request.get_json()
-		roll = details["rollno"]
+    try:
+        details = request.get_json()
+        roll = details["rollno"]
 
-		student = get_student(db, roll)
+        student = get_student(db, roll)
 
-		if not student:
-			return jsonify({"message": "Student does not exist!"})
+        if not student:
+            return jsonify({"message": "Student does not exist!"}), 404
 
-		student.fname = details.get("fname", student.fname)
-		student.lname = details.get("lname", student.lname)
-		student.phone = details.get("phone", student.phone)
-		student.address = details.get("address", student.address)
-		student.class_id = details.get("class_id", student.class_id)
+        student.fname = details.get("fname", student.fname)
+        student.lname = details.get("lname", student.lname)
+        student.phone = details.get("phone", student.phone)
+        student.address = details.get("address", student.address)
 
-		db.commit()
-		
-		return jsonify({"message": "Student updated successfully!"})
-	
-	except Exception as e:
-		return jsonify({"message": "An error occurred while updating the student."})
+        if "class_name" in details:
+            class_id = get_class_id(db, details["class_name"])
 
+            if class_id is None:
+                return jsonify({"message": "Class does not exist!"}), 404
+
+            student.class_id = class_id
+
+        db.commit()
+
+        return jsonify({"message": "Student updated successfully!"}), 200
+
+    except Exception as e:
+        db.rollback()
+        print(e)
+        return jsonify({"message": "An error occurred while updating the student."}), 500
+
+    finally:
+        db.close()
 @student_bp.route("/", methods=["DELETE"])
 def delete_students():
 	db = SessionLocal()
@@ -107,11 +118,11 @@ def delete_students():
 		details = request.get_json()
 
 		if not get_student(db, details["rollno"]):
-			return jsonify({"message": "Student(s) does not exist!"})
+			return jsonify({"message": "Student does not exist!"})
 		
 		delete_student(db, details["rollno"])
 		
-		return jsonify({"message": "Student(s) deleted successfully!"})
+		return jsonify({"message": "Student deleted successfully!"})
 	
 	except Exception as e:
 		return jsonify({"message": "An error occurred while deleting the student."})

@@ -53,7 +53,7 @@ use /students as url prefix
 	"rollno": "NCE080BCT103",
 	"fname": "Nylon",
 	"lname": "Sharma",
-	"class_id": 1,
+	"class_name": "A-101",
 	"phone": 9845118910,
 	"address": "Bhaktapur"
 }
@@ -66,7 +66,7 @@ use /students as url prefix
 	"rollno": "NCE080BCT103",
 	"fname": "Nylon",
 	"lname": "Sharma",
-	"class_id": 1,
+	"class_name": "A-101",
 	"phone": 9845118910,
 	"address": "Bhaktapur"
 }
