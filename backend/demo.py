@@ -7,7 +7,11 @@ while True:
     if input_choice == 'r':
         registration_service()
     elif input_choice == 'c':
-        recognition_service()
+        class_name = input("Enter the class name: ").strip()
+        if class_name:
+            recognition_service(class_name)
+        else:
+            recognition_service()
     elif input_choice == 'e':
         print("Exiting...")
         break

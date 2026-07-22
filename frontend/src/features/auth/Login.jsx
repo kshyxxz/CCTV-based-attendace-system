@@ -17,7 +17,7 @@ function Login() {
     e.preventDefault(); // Stop page reload
     setError(""); // Clear old errors
 
-    // Simple temporary validation rule (Change this to your actual API logic later)
+    // Simple temporary validation rule
     if (username === "admin" && password === "admin") {
       // Navigate to dashboard and erase login page from browser history back-stack
       navigate("/dashboard", { replace: true });

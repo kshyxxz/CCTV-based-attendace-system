@@ -6,11 +6,14 @@ node_modules/
 .pnp.js
 dist/
 .env
-test.py
-test_crud.py
 uploads
 embeddings
 .vscode
 __pycache__
+__pycache__/
+.pyc
+test.py
+test_crud.py
 try1.py
 try2.py
+db.json
