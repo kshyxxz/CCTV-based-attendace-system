@@ -1,5 +1,5 @@
 from flask import Flask
-from api.atteandance import attendance_bp
+from api.attendance import attendance_bp
 from api.student import student_bp
 from api.subject import subject_bp
 from api.classe import class_bp
