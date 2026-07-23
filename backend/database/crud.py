@@ -104,14 +104,34 @@ def create_class(db, data):
 	db.refresh(classe)
 	return classe
 
+def update_class(db, data):
+	class_name = data.get("class_name")
+	new_class_name = data.get("new_class_name")
+
+	class_id = get_class_id(db, class_name)
+
+	classe = get_class(db, class_id)
+
+	if not classe:
+		raise ValueError("Class does not exist.")
+
+	if class_name:
+		classe.class_name = new_class_name
+
+	db.commit()
+	db.refresh(classe)
+	return classe
+
 def get_student_class(db, rollno):
 	student = get_student(db, rollno)
 	if student:
 		return student.class_id
 	return None
 
-def delete_class(db: Session, classe_id: int):
-	classe = get_class(db, classe_id)
+def delete_class(db: Session, classe_name: str):
+
+	class_id = get_class_id(db, classe_name)
+	classe = get_class(db, class_id)
 
 	if classe:
 		db.delete(classe)
