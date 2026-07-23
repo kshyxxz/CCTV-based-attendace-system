@@ -134,3 +134,58 @@ use /classes as url prefix
 	"class_name": "A-100"
 }
 ```
+
+## Subject APIs:
+
+use /subjects as url prefix
+
+| Method | Endpoint |   Description    |
+| :----: | :------: | :--------------: |
+|  GET   |   `/`    | Get all subjects |
+|  POST  |   `/`    |  Create subject  |
+|  PUT   |   `/`    |  Update subject  |
+| DELETE |   `/`    |  Delete subject  |
+
+### GET `/` : output
+
+```json
+[
+	{
+		"subject_code": "ENCT351",
+		"subject_id": 1,
+		"subject_name": "Artificial Intelligence"
+	},
+	{
+		"subject_code": "ENCT205",
+		"subject_id": 2,
+		"subject_name": "Data Communication"
+	}
+]
+```
+
+### POST `/` : input
+
+```json
+{
+	"subject_name": "Data Communication",
+	"subject_code": "ENEX203"
+}
+```
+
+### PUT `/` : input
+
+```json
+{
+	"subject_id": "3",
+	"new_subject_code": "ENCT303", // either code or name or both
+	"new_subject_name": "Data Communication"
+}
+```
+
+### DELETE `/` : input
+
+```json
+{
+	"subject_id": "2"
+}
+```

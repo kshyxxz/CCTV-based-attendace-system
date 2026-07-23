@@ -142,12 +142,34 @@ def delete_class(db: Session, classe_name: str):
 def get_subject(db, subject_id):
 	return db.query(Subject).filter(Subject.subject_id == subject_id).first()
 
+def get_subject_by_code(db, subject_code):
+	return db.query(Subject).filter(Subject.subject_code == subject_code).first()
+
 def get_all_subjects(db: Session):
 	return db.query(Subject).all()
 
 def create_subject(db, data):
 	subject = Subject(**data)
 	db.add(subject)
+	db.commit()
+	db.refresh(subject)
+	return subject
+
+def update_subject(db, data):
+	subject_id = data.get("subject_id")
+	new_subject_code = data.get("new_subject_code")
+	new_subject_name = data.get("new_subject_name")
+
+	subject = get_subject(db, subject_id)
+
+	if not subject:
+		raise ValueError("Subject does not exist.")
+
+	if new_subject_code:
+		subject.subject_code = new_subject_code
+	if new_subject_name:
+		subject.subject_name = new_subject_name
+
 	db.commit()
 	db.refresh(subject)
 	return subject
