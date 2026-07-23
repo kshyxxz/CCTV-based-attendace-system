@@ -1,4 +1,3 @@
-// hooks/useStudents.js
 import { useState, useEffect } from "react";
 import { studentService } from "../services/studentServices";
 
@@ -7,7 +6,7 @@ export function useStudents() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingStudent, setEditingStudent] = useState(null); // Tracks the student being modified
+  const [editingStudent, setEditingStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   const fetchStudents = async () => {
@@ -23,9 +22,9 @@ export function useStudents() {
     }
   };
 
-  const handleEditClick = (student) => {
+  const handleEditClick = (student = null) => {
     setEditingStudent(student);
-    setIsModalOpen(true); // Reuses your modal form block for editing
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -33,15 +32,13 @@ export function useStudents() {
     setIsModalOpen(false);
   };
 
-  const handleDeleteStudent = async (studentId) => {
-    if (
-      !window.confirm("Are you sure you want to delete this student profile?")
-    ) {
+  const handleDeleteStudent = async (rollno) => {
+    if (!window.confirm(`Are you sure you want to delete student ${rollno}?`)) {
       return;
     }
     try {
       setError(null);
-      await studentService.deleteStudent(studentId);
+      await studentService.deleteStudent(rollno);
       await fetchStudents();
     } catch (err) {
       setError(`Failed to delete student: ${err.message}`);
@@ -57,10 +54,10 @@ export function useStudents() {
     loading,
     error,
     isModalOpen,
-    editingStudent, // Expose to pass into StudentForm
+    editingStudent,
     searchQuery,
     setSearchQuery,
-    handleEditClick, // Expose to Table layout row buttons
+    handleEditClick,
     handleCloseModal,
     refreshStudents: fetchStudents,
     handleDeleteStudent,

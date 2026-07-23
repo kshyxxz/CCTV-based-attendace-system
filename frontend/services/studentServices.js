@@ -1,63 +1,61 @@
-// services/studentServices.js
 import { BASE_URL, handleResponse } from "./api";
 
-const API_URL = BASE_URL || "http://localhost:5000";
+const API_URL = BASE_URL
+  ? `${BASE_URL}/students`
+  : "http://127.0.0.1:5000/students";
 
 export const studentService = {
+  // GET / -> Fetch all students
   getStudents: async () => {
-    return fetch(`${API_URL}/students`, {
+    return fetch(`${API_URL}/`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then(handleResponse);
   },
 
-  saveStudent: async (payload, imageFile) => {
-    let bodyData;
-    let headers = {};
+  // GET /classes -> Fetch dynamic classes list for the dropdown
+  getClasses: async () => {
+    const classesUrl = BASE_URL
+      ? `${BASE_URL}/classes`
+      : "http://127.0.0.1:5000/classes";
+    return fetch(`${classesUrl}/`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }).then(handleResponse);
+  },
 
-    if (imageFile) {
-      const data = new FormData();
-      data.append("studentData", JSON.stringify(payload));
-      data.append("avatar", imageFile);
-      bodyData = data;
-    } else {
-      bodyData = JSON.stringify(payload);
-      headers["Content-Type"] = "application/json";
-    }
+  // GET /<rollno> -> Fetch single student
+  getStudentByRollNo: async (rollno) => {
+    return fetch(`${API_URL}/${rollno}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }).then(handleResponse);
+  },
 
-    return fetch(`${API_URL}/students`, {
+  // POST /create -> Create student
+  saveStudent: async (payload) => {
+    return fetch(`${API_URL}/create`, {
       method: "POST",
-      headers: headers,
-      body: bodyData,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     }).then(handleResponse);
   },
 
-  // Update an existing student's details
-  updateStudent: async (studentId, payload, imageFile) => {
-    let bodyData;
-    let headers = {};
-
-    if (imageFile) {
-      const data = new FormData();
-      data.append("studentData", JSON.stringify(payload));
-      data.append("avatar", imageFile);
-      bodyData = data;
-    } else {
-      bodyData = JSON.stringify(payload);
-      headers["Content-Type"] = "application/json";
-    }
-
-    return fetch(`${API_URL}/students/${studentId}`, {
+  // PUT / -> Update student profile
+  updateStudent: async (payload) => {
+    return fetch(`${API_URL}/`, {
       method: "PUT",
-      headers: headers,
-      body: bodyData,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     }).then(handleResponse);
   },
 
-  deleteStudent: async (studentId) => {
-    return fetch(`${API_URL}/students/${studentId}`, {
+  // DELETE / -> Delete student
+  deleteStudent: async (rollno) => {
+    return fetch(`${API_URL}/`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rollno }),
     }).then(handleResponse);
   },
 };

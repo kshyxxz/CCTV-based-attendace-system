@@ -1,10 +1,9 @@
-// Student.jsx
 import React from "react";
 import { FaPlus, FaSearch } from "react-icons/fa";
-import StudentTable from "./StudentTable";
+import StudentTable from "./studentTable";
 import StudentForm from "./StudentForm";
 import { useStudents } from "../../../hooks/useStudents";
-import "./Students.css";
+import "./students.css";
 
 function Students() {
   const {
@@ -21,17 +20,20 @@ function Students() {
     handleDeleteStudent,
   } = useStudents();
 
-  const filteredStudents = students.filter(
-    (student) =>
-      student.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.rollNo?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredStudents =
+    students?.filter?.(
+      (student) =>
+        student.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.rollno?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.class_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        student.address?.toLowerCase().includes(searchQuery.toLowerCase()),
+    ) || [];
 
   return (
     <div className="student-container">
       <div className="student-header">
         <div>
-          <h1>Student Management</h1>
+          <h1>Student Registry</h1>
           <p className="subtitle">{students.length} students enrolled</p>
         </div>
         <button className="btn-add" onClick={() => handleEditClick(null)}>
@@ -44,27 +46,27 @@ function Students() {
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Search by name or roll no..."
+            placeholder="Search by name, roll no, class, or address..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
       </div>
 
-      {loading && <div className="status-message">Loading profiles...</div>}
+      {loading && <div className="status-message">Loading students...</div>}
       {error && <div className="status-message error-text">Error: {error}</div>}
 
       {!loading && !error && (
         <StudentTable
           filteredStudents={filteredStudents}
-          onEdit={handleEditClick} // <-- Pass down edit click handler
+          onEdit={handleEditClick}
           onDelete={handleDeleteStudent}
         />
       )}
 
       {isModalOpen && (
         <StudentForm
-          studentData={editingStudent} // <-- Pass down item data (null means new student mode)
+          studentData={editingStudent}
           onClose={handleCloseModal}
           refreshStudents={refreshStudents}
         />

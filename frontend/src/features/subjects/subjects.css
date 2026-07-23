@@ -1,0 +1,282 @@
+/* ==========================================================================
+   SUBJECTS PAGE WRAPPER 
+   ========================================================================== */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family:
+    "Poppins",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   TOP HEADER & NAVIGATION BAR
+   ========================================================================== */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  margin: 6px 0 0 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+/* Primary Action Button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #2563eb;
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.section-meta {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+/* ==========================================================================
+   SUBJECTS DATA TABLE CONTAINER
+   ========================================================================== */
+.subjects-table-wrapper {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  overflow-x: auto;
+}
+
+.subjects-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.subjects-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  padding: 14px 18px;
+  border-bottom: 2px solid #edf2f7;
+}
+
+.subjects-table td {
+  padding: 16px 18px;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.subjects-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.subjects-table tbody tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Alignments */
+.text-right {
+  text-align: right;
+}
+
+.text-muted {
+  color: #64748b;
+}
+
+/* ==========================================================================
+   BADGES & CELL COMPONENTS
+   ========================================================================== */
+.code-badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.subject-title {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* ==========================================================================
+   ACTION BUTTONS
+   ========================================================================== */
+.table-actions {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.btn-action {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.btn-action:hover {
+  color: #0f172a;
+  background-color: #f1f5f9;
+}
+
+.btn-action:hover[title="Delete"] {
+  color: #dc2626;
+  background-color: #fee2e2;
+}
+
+/* ==========================================================================
+   LOADING & ERROR STATES
+   ========================================================================== */
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.error-text {
+  color: #ef4444;
+}
+
+/* ==========================================================================
+   MODAL STYLES
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header h2 {
+  font-size: 1.25rem;
+  margin: 0 0 16px 0;
+  color: #0f172a;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.815rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.form-group input {
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.875rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-cancel {
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-submit {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
