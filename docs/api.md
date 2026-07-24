@@ -189,3 +189,59 @@ use /subjects as url prefix
 	"subject_id": "2"
 }
 ```
+
+## Dashboard API:
+
+use /dashboard as url prefix
+
+| Method | Endpoint | Description |
+| :----: | :------: | :---------: |
+|  GET   |   `/`    | Get summary |
+
+### GET `/` : output
+
+```json
+{
+	"subject_distribution": [
+		{
+			"count": 45,
+			"subject": "Artificial Intelligence"
+		},
+		{
+			"count": 89,
+			"subject": "Data Communication"
+		},
+		{
+			"count": 12,
+			"subject": "Engineering Mathematics II"
+		}
+	],
+	"today": {
+		"absent": 12,
+		"attendance_rate": 0.95,
+		"present": 228
+	},
+	"weekly_trend": [
+		{
+			"date": "2026-07-20",
+			"rate": 0.89
+		},
+		{
+			"date": "2026-07-21",
+			"rate": 0.78
+		},
+		{
+			"date": "2026-07-22",
+			"rate": 0.8
+		},
+		{
+			"date": "2026-07-23",
+			"rate": 0.87
+		},
+		{
+			"date": "2026-07-24",
+			"rate": 0.76
+		}
+	]
+}
+```
