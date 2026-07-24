@@ -1,23 +1,63 @@
 import cv2
 
-def load_video(video_path):  
-	cap = cv2.VideoCapture(video_path)      
-	if not cap.isOpened():
-		raise ValueError(f"Unable to open video file at {video_path}")
-	return cap
+
+def load_video(video_path):
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise ValueError(f"Unable to open video file at {video_path}")
+    return cap
+
 
 def load_camera(camera_index=0):
-	cap = cv2.VideoCapture(camera_index)
-	if not cap.isOpened():
-		raise ValueError(f"Unable to open camera with index {camera_index}")
-	return cap
+    cap = cv2.VideoCapture(camera_index)
+    if not cap.isOpened():
+        raise ValueError(f"Unable to open camera with index {camera_index}")
+    return cap
+
 
 def get_frame(cap):
-	ret, frame = cap.read()
-	if not ret:
-		raise ValueError("Unable to read frame from video capture")
-	return frame
+    ret, frame = cap.read()
+    if not ret:
+        raise ValueError("Unable to read frame from video capture")
+    return frame
+
+
+def get_capture(cap):
+    return cap.read()
+
+
+def extract_frame(cap, interval_seconds=1):
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    if fps <= 0:
+        fps = 30
+
+    frame_interval = max(1, int(fps * interval_seconds))
+    frame_count = 0
+
+    while True:
+        ret, frame = get_capture(cap)
+        if not ret:
+            break
+
+        if frame_count % frame_interval == 0:
+            yield frame
+
+        display_frame = cv2.resize(frame, (640, 480))
+        cv2.imshow("Camera", display_frame)
+
+        if stop_camera():
+            break
+
+        frame_count += 1
+
+    release_camera(cap)
+
+
+def stop_camera(key='q'):
+    return cv2.waitKey(1) & 0xFF == ord(key)
+
 
 def release_camera(cap):
-	cap.release()
-	return cv2.destroyAllWindows()
+    cap.release()
+    return cv2.destroyAllWindows()
