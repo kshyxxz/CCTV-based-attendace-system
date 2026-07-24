@@ -5,6 +5,9 @@ import {
   Users,
   Camera,
   FileText,
+  Calendar, // Added for Timetable
+  BookOpen, // Added for Subjects
+  GraduationCap, // Added for Classes
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
@@ -18,6 +21,9 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
     { name: "Students", icon: Users, path: "/students" },
     { name: "Live Attendance", icon: Camera, path: "/recognition" },
     { name: "Attendance", icon: FileText, path: "/attendance" },
+    { name: "Timetable", icon: Calendar, path: "/timetable" },
+    { name: "Subjects", icon: BookOpen, path: "/subjects" },
+    { name: "Classes", icon: GraduationCap, path: "/classes" },
   ];
 
   return (
@@ -60,7 +66,7 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
           );
         })}
 
-        {/* 2. Added Logout Section at the bottom of the nav */}
+        {/* Logout Section */}
         <NavLink
           to="/login"
           className={({ isActive }) =>

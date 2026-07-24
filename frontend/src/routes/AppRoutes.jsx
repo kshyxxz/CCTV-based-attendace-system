@@ -6,6 +6,9 @@ import Dashboard from "../features/dashboard/Dashboard";
 import DashboardLayout from "../layouts/DashboardLayout";
 import LiveRecognition from "../features/recognition/LiveRecognition";
 import Attendance from "../features/attendance/Attendance";
+import Timetable from "../features/timetable/timetable";
+import Subjects from "../features/subjects/Subjects";
+import Classes from "../features/classes/Classes";
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -22,6 +25,9 @@ export default function AppRoutes() {
 
           <Route path="/recognition" element={<LiveRecognition />} />
           <Route path="/attendance" element={<Attendance />} />
+          <Route path="/subjects" element={<Subjects />} />
+          <Route path="/timetable" element={<Timetable />} />
+          <Route path="/classes" element={<Classes />} />
           {/* Remaining sub-features placeholders */}
           <Route
             path="/live-attendance"

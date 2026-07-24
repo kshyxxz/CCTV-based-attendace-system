@@ -1,4 +1,3 @@
-// StudentTable.jsx
 import React from "react";
 import { FaTrash, FaPencilAlt } from "react-icons/fa";
 
@@ -8,65 +7,50 @@ export default function StudentTable({ filteredStudents, onEdit, onDelete }) {
       <table className="student-table">
         <thead>
           <tr>
-            <th>Student</th>
             <th>Roll No</th>
+            <th>Name</th>
+            <th>Class</th>
+            <th>Address</th>
             <th>Phone</th>
             <th>Embedding</th>
-            <th>Attendance</th>
             <th className="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredStudents.length === 0 ? (
             <tr>
-              <td colSpan="6" className="text-center text-muted py-4">
-                No records found.
+              <td colSpan="7" className="text-center text-muted py-4">
+                No student records found.
               </td>
             </tr>
           ) : (
             filteredStudents.map((student) => (
-              <tr key={student.id || student.rollNo}>
+              <tr key={student.rollno}>
+                <td className="student-name">{student.rollno}</td>
+                <td>{student.name}</td>
                 <td>
-                  <div className="student-profile-cell">
-                    <img
-                      src={student.avatar || "https://via.placeholder.com/40"}
-                      alt={student.name}
-                      className="table-avatar"
-                    />
-                    <div>
-                      <div className="student-name">{student.name}</div>
-                      <div className="student-email">{student.email}</div>
-                    </div>
-                  </div>
+                  <span
+                    className="badge"
+                    style={{ backgroundColor: "#e2e8f0", color: "#334155" }}
+                  >
+                    {student.class_name || "Unassigned"}
+                  </span>
                 </td>
-                <td className="text-muted">{student.rollNo}</td>
+                <td className="text-muted">{student.address || "N/A"}</td>
                 <td className="text-muted">{student.phone}</td>
                 <td>
                   <span
-                    className={`badge ${(student.embedding || "Pending").toLowerCase()}`}
+                    className={`badge ${student.embedding ? "completed" : "pending"}`}
                   >
                     <span className="dot"></span>{" "}
-                    {student.embedding || "Pending"}
+                    {student.embedding ? "Ready" : "Pending"}
                   </span>
-                </td>
-                <td>
-                  <div className="attendance-cell">
-                    <div className="progress-bar-container">
-                      <div
-                        className="progress-bar"
-                        style={{ width: `${student.attendance || 0}%` }}
-                      ></div>
-                    </div>
-                    <span className="attendance-percentage">
-                      {student.attendance || 0}%
-                    </span>
-                  </div>
                 </td>
                 <td className="text-center">
                   <div
                     style={{
                       display: "flex",
-                      gap: "10px",
+                      gap: "8px",
                       justifyContent: "center",
                     }}
                   >
@@ -79,7 +63,7 @@ export default function StudentTable({ filteredStudents, onEdit, onDelete }) {
                     </button>
                     <button
                       className="btn-delete"
-                      onClick={() => onDelete(student.id || student.rollNo)}
+                      onClick={() => onDelete(student.rollno)}
                       title="Delete Student"
                     >
                       <FaTrash />
