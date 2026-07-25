@@ -12,6 +12,8 @@ __pycache__
 __pycache__/
 .pyc
 test_crud.py
+tests
+.pytest_cache
 
 db.json
 my_packages.txt

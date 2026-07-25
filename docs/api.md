@@ -245,3 +245,114 @@ use /dashboard as url prefix
 	]
 }
 ```
+
+## Timetable APIs:
+
+use /timetable as url prefix
+
+| Method |        Endpoint        |          Description           |
+| :----: | :--------------------: | :----------------------------: |
+|  GET   |    `/<class_name>/`    |  Get timetable for that class  |
+|  POST  | `/<class_name>/create` | Create a period for that class |
+|  PUT   |    `/<class_name>/`    | Update a period for that class |
+| DELETE |    `/<class_name>/`    | Delete a period for that class |
+
+### GET `/<class_name> : output
+
+```json
+{
+	"Friday": [
+		{
+			"end_time": "11:00:00",
+			"start_time": "10:00:00",
+			"subject_name": "Artificial Intelligence",
+			"timetable_id": 18
+		}
+	],
+	"Monday": [
+		{
+			"end_time": "10:30:00",
+			"start_time": "07:45:00",
+			"subject_name": "Artificial Intelligence",
+			"timetable_id": 1
+		},
+		{
+			"end_time": "09:00:00",
+			"start_time": "08:00:00",
+			"subject_name": "Artificial Intelligence",
+			"timetable_id": 11
+		},
+		{
+			"end_time": "10:00:00",
+			"start_time": "09:00:00",
+			"subject_name": "Artificial Intelligence",
+			"timetable_id": 12
+		}
+	],
+	"Thursday": [
+		{
+			"end_time": "09:00:00",
+			"start_time": "08:00:00",
+			"subject_name": "Artificial Intelligence",
+			"timetable_id": 17
+		}
+	],
+	"Tuesday": [
+		{
+			"end_time": "09:30:00",
+			"start_time": "08:00:00",
+			"subject_name": "Artificial Intelligence",
+			"timetable_id": 13
+		},
+		{
+			"end_time": "11:00:00",
+			"start_time": "10:00:00",
+			"subject_name": "Artificial Intelligence",
+			"timetable_id": 14
+		}
+	],
+	"Wednesday": [
+		{
+			"end_time": "09:30:00",
+			"start_time": "08:30:00",
+			"subject_name": "Artificial Intelligence",
+			"timetable_id": 15
+		},
+		{
+			"end_time": "10:30:00",
+			"start_time": "09:30:00",
+			"subject_name": "Artificial Intelligence",
+			"timetable_id": 16
+		}
+	]
+}
+```
+
+### POST `/<class_name>/create` : input
+
+```json
+{
+	"class_name": "A-101",
+	"subject_code": "ENSH105",
+	"day_of_week": "Sunday",
+	"start_time": "07:45:00",
+	"end_time": "09:00:00"
+}
+```
+
+### PUT `/<class_name>/` : input
+
+```json
+{
+	"timetable_id": "1",
+	"subject_code": "ENSH105"
+}
+```
+
+### DELETE `/<class_name>/` : input
+
+```json
+{
+	"timetable_id": "1"
+}
+```
