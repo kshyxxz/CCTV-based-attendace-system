@@ -213,12 +213,47 @@ def get_current_timetable(db, class_id):
         .all()
     )
 
+from collections import defaultdict
+
+def get_class_timetable(db: Session, class_name: str):
+	class_id = get_class_id(db, class_name)
+
+	timetable =  db.query(Timetable).filter(Timetable.class_id == class_id).all()
+
+	grouped = defaultdict(list)
+
+	for entry in timetable:
+		grouped[entry.day_of_week].append({
+			"subject_name": get_subject(db, entry.subject_id).subject_name,
+			"start_time": entry.start_time.isoformat(),
+			"end_time": entry.end_time.isoformat(),
+			"timetable_id": entry.timetable_id
+		})
+	return grouped
+
 def get_timetable(db: Session, timetable_id: int):
-	return (db.query(Timetable).filter(Timetable.timetable_id == timetable_id).first())
+	return db.query(Timetable).filter(Timetable.timetable_id == timetable_id).first()
 
 
 def create_timetable(db, data):
+
+	subject_code = data["subject_code"]
+	class_name = data["class_name"]
+
+	subject_id = get_subject_by_code(db, subject_code).subject_id
+	class_id = get_class_id(db, class_name)
+
+	data = {
+		**data,
+		"subject_id": subject_id,
+		"class_id": class_id
+	}
+
+	del data["subject_code"]
+	del data["class_name"]
+
 	timetable = Timetable(**data)
+
 	db.add(timetable)
 	db.commit()
 	db.refresh(timetable)

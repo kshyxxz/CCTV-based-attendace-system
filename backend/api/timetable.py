@@ -1,84 +1,71 @@
 from flask import Blueprint, jsonify, request
 
 from database.database import SessionLocal
-from database.crud import get_all_timetable, create_timetable, get_timetable, delete_timetable
+from database.crud import get_subject_by_code, create_timetable, get_class_timetable, get_timetable, delete_timetable
 
 timetable_bp = Blueprint("timetable", __name__)
-
-# TODO: FIX THIS API 
-
-@timetable_bp.route("/", methods=["GET"])
-def ret_timetable():
-	db = SessionLocal()
-
-	try:
-		timetables = get_all_timetable(db)
-
-		if timetables is not None:
-			return jsonify([{
-				"class_id": timetable.class_id,
-				"subject_id": timetable.subject_id,
-				"day_of_week": timetable.day_of_week,
-				"start_time": timetable.start_time.isoformat(),	# isoformat() time is not JSON serializable
-				"end_time": timetable.end_time.isoformat()
-			} for timetable in timetables])
-		
-		else:
-			return jsonify({"message": "Timetable is empty!"})
-
-	except Exception as e:
-		return jsonify({"error": f"{e}"})
 	
-@timetable_bp.route("/<timetable_id>", methods=["GET"])
-def get_timetable_by_id(timetable_id):
+@timetable_bp.route("/<class_name>", methods=["GET"])
+def get_timetable_by_id(class_name):
 	db = SessionLocal()
 
 	try:
-		timetable = get_timetable(db, timetable_id)
+		timetable = get_class_timetable(db, class_name)
 
 		if timetable:
-			return jsonify({
-				"class_id": timetable.class_id,
-				"subject_id": timetable.subject_id,
-				"day_of_week": timetable.day_of_week,
-				"start_time": timetable.start_time.isoformat(),
-				"end_time": timetable.end_time.isoformat()
-			})
+			return jsonify(timetable)
 		else:
 			return jsonify({"error": "Timetable not found!"})
 
 	except Exception as e:
 		return jsonify({"error": f"{e}"})
 	
-@timetable_bp.route("/create", methods=["POST"])
+@timetable_bp.route("/<class_name>/create", methods=["POST"])
 def add_timetable():
 	db = SessionLocal()
 
 	try:
 		details = request.get_json()
 
-		for detail in details:
-			create_timetable(db, detail)
+		create_timetable(db, details)
 
-		return jsonify({"message": "Timetable(s) created successfully!"})
+		return jsonify({"message": "Timetable created successfully!"})
 	
 	except Exception as e:
 		return jsonify({"error": f"{e}"})
-	
-@timetable_bp.route("/", methods=["DELETE"])
-def delete_timetables():
+
+@timetable_bp.route("/<class_name>/", methods=["PUT"])
+def update_timetable(class_name):
+	db = SessionLocal()
+
+	try:
+		details = request.get_json()
+		timetable_id = details.get("timetable_id")
+		subject_code = details.get("subject_code")
+
+		timetable = get_timetable(db, timetable_id)
+
+		if not timetable:
+			return jsonify({"error": "Timetable not found!"})
+
+		timetable.subject_id = get_subject_by_code(db, subject_code).subject_id
+		db.commit()
+
+		return jsonify({"message": "Timetable updated successfully!"})
+
+	except Exception as e:
+		return jsonify({"error": f"{e}"})
+
+@timetable_bp.route("/<class_name>/", methods=["DELETE"])
+def delete_timetables(class_name):
 	db = SessionLocal()
 
 	try:
 		details = request.get_json()
 
-		for detail in details:
-			if not get_timetable(db, detail["timetable_id"]):
-				return jsonify({"error": "Timetable(s) does not exist!"})
-			
-			delete_timetable(db, detail["timetable_id"])
+		delete_timetable(db, details["timetable_id"])
 
-		return jsonify({"message": "Timetable(s) deleted successfully!"})
+		return jsonify({"message": "Timetable deleted successfully!"})
 	
 	except Exception as e:
 		return jsonify({"error": f"{e}"})
