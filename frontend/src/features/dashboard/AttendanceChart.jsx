@@ -20,15 +20,24 @@ ChartJS.register(
   Legend,
 );
 
-function AttendanceChart({ chartMetrics }) {
+function AttendanceChart({ weeklyTrend }) {
+  const labels = weeklyTrend.map((item) => {
+    const date = new Date(item.date);
+    return date.toLocaleDateString("en-US", { weekday: "short" });
+  });
+
+  const chartDataPoints = weeklyTrend.map((item) =>
+    Math.round((item.rate || 0) * 100),
+  );
+
   const chartData = {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sun"],
+    labels: labels.length ? labels : ["Mon", "Tue", "Wed", "Thu", "Fri"],
     datasets: [
       {
         label: "Attendance Rate %",
-        data: chartMetrics,
-        borderColor: "#4f46e5",
-        backgroundColor: "rgba(79, 70, 229, 0.1)",
+        data: chartDataPoints,
+        borderColor: "#2563eb",
+        backgroundColor: "rgba(37, 99, 235, 0.1)",
         tension: 0.3,
         fill: true,
       },
@@ -43,11 +52,20 @@ function AttendanceChart({ chartMetrics }) {
         display: false,
       },
     },
+    scales: {
+      y: {
+        min: 0,
+        max: 100,
+        ticks: {
+          callback: (value) => `${value}%`,
+        },
+      },
+    },
   };
 
   return (
     <div className="chart-box">
-      <h2>Attendance Trend</h2>
+      <h2>Weekly Attendance Trend</h2>
       <div style={{ height: "250px", position: "relative" }}>
         <Line data={chartData} options={chartOptions} />
       </div>

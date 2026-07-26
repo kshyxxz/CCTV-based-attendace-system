@@ -1,79 +1,121 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTimetable } from "../../../hooks/useTimetable";
+import { TimetableHeader } from "./TimetableHeader";
+import { TimetableGrid } from "./TimetableGrid";
+import { TimetableModal } from "./TimetableModal";
 import "./timetable.css";
 
-function Timetable() {
-  const { selectedClass, setSelectedClass, schedule, loading } = useTimetable();
+// Helper: Ensures "HH:MM:SS" format for backend database insertion
+const ensureSecondsFormat = (timeStr) => {
+  if (!timeStr) return "00:00:00";
+  const parts = timeStr.trim().split(":");
+  if (parts.length === 2) return `${timeStr.trim()}:00`;
+  return timeStr.trim();
+};
 
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+// Standard fixed period slots matching institutional routine structures
+const DEFAULT_TIME_SLOTS = [
+  { startRaw: "07:15:00", endRaw: "08:00:00", rawKey: "07:15-08:00" },
+  { startRaw: "08:00:00", endRaw: "08:45:00", rawKey: "08:00-08:45" },
+  { startRaw: "08:45:00", endRaw: "09:30:00", rawKey: "08:45-09:30" },
+  { startRaw: "09:30:00", endRaw: "10:15:00", rawKey: "09:30-10:15" },
+  { startRaw: "10:15:00", endRaw: "11:00:00", rawKey: "10:15-11:00" },
+  { startRaw: "11:00:00", endRaw: "11:45:00", rawKey: "11:00-11:45" },
+  { startRaw: "11:45:00", endRaw: "12:30:00", rawKey: "11:45-12:30" },
+  { startRaw: "12:30:00", endRaw: "13:15:00", rawKey: "12:30-01:15" },
+  { startRaw: "13:15:00", endRaw: "14:00:00", rawKey: "01:15-02:00" },
+  { startRaw: "14:00:00", endRaw: "14:45:00", rawKey: "02:00-02:45" },
+  { startRaw: "14:45:00", endRaw: "15:30:00", rawKey: "02:45-03:30" },
+];
+
+function Timetable() {
+  const {
+    classesList = [],
+    selectedClass,
+    setSelectedClass,
+    schedule = {},
+    loading,
+    error,
+    addPeriod,
+    deletePeriod,
+  } = useTimetable();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    subject_code: "",
+    day_of_week: "Monday",
+    start_time: "08:00:00",
+    end_time: "08:45:00",
+  });
+
+  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+  // Check if schedule contains any periods
+  const isScheduleEmpty = Array.isArray(schedule)
+    ? schedule.length === 0
+    : Object.keys(schedule || {}).length === 0 ||
+      Object.values(schedule || {}).every((arr) => !arr || arr.length === 0);
+
+  const handleDelete = async (timetableId) => {
+    if (window.confirm("Remove this period?")) {
+      try {
+        await deletePeriod(timetableId);
+      } catch (err) {
+        alert(`Delete failed: ${err.message}`);
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await addPeriod({
+        class_name: selectedClass,
+        subject_code: formData.subject_code,
+        day_of_week: formData.day_of_week,
+        start_time: ensureSecondsFormat(formData.start_time),
+        end_time: ensureSecondsFormat(formData.end_time),
+      });
+      setIsModalOpen(false);
+    } catch (err) {
+      alert(`Failed to add period: ${err.message}`);
+    }
+  };
 
   return (
-    <div className="page-container">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Timetable</h1>
-          <p className="page-subtitle">Weekly schedule by class</p>
-        </div>
+    <div className="timetable-page">
+      <TimetableHeader
+        selectedClass={selectedClass}
+        setSelectedClass={setSelectedClass}
+        classesList={classesList}
+        onOpenAddModal={() => setIsModalOpen(true)}
+      />
+
+      <div className="timetable-card-container">
+        {loading ? (
+          <div className="state-message">Loading schedule...</div>
+        ) : error ? (
+          <div className="state-message error">{error}</div>
+        ) : (
+          <TimetableGrid
+            daysOfWeek={daysOfWeek}
+            timeSlots={DEFAULT_TIME_SLOTS}
+            schedule={schedule}
+            isScheduleEmpty={isScheduleEmpty}
+            onDelete={handleDelete}
+          />
+        )}
       </div>
 
-      <div className="timetable-toolbar">
-        <select
-          className="class-select-dropdown"
-          value={selectedClass}
-          onChange={(e) => setSelectedClass(e.target.value)}
-        >
-          <option value="Grade 10 - A">Grade 10 - A</option>
-          <option value="Grade 10 - B">Grade 10 - B</option>
-          <option value="Grade 11 - A">Grade 11 - A</option>
-        </select>
-        <span className="academic-year-text">
-          Weekly Schedule • Academic Year 2025–26
-        </span>
-      </div>
-
-      {loading ? (
-        <div className="loading-state">Loading timetable...</div>
-      ) : (
-        <div className="timetable-grid-wrapper">
-          <table className="timetable-grid">
-            <thead>
-              <tr>
-                <th>TIME</th>
-                {days.map((day) => (
-                  <th key={day}>{day}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {schedule.map((slot, index) => (
-                <tr key={index}>
-                  <td className="time-slot-cell">{slot.time}</td>
-                  {days.map((day) => {
-                    const item = slot[day];
-                    return (
-                      <td key={day}>
-                        {item ? (
-                          <div className="slot-card">
-                            <div
-                              className="slot-subject"
-                              style={{ color: item.color }}
-                            >
-                              {item.subject}
-                            </div>
-                            <div className="slot-teacher">{item.teacher}</div>
-                          </div>
-                        ) : (
-                          <div className="slot-card empty">-</div>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <TimetableModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmit}
+        formData={formData}
+        setFormData={setFormData}
+        selectedClass={selectedClass}
+        daysOfWeek={daysOfWeek}
+      />
     </div>
   );
 }
