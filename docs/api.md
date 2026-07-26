@@ -48,15 +48,17 @@ use /students as url prefix
 
 ### POST `/create` : input
 
-```json
-{
-	"rollno": "NCE080BCT103",
-	"fname": "Nylon",
-	"lname": "Sharma",
-	"class_name": "A-101",
-	"phone": 9845118910,
-	"address": "Bhaktapur"
-}
+form input
+
+```
+|   Key   | Type |      Value       |
+| :-----: | :--: | :--------------: |
+| rollno  | text |   NCE080BCT001   |
+|  fname  | text |      Aavash      |
+|  lname  | text |      Tiwari      |
+|  phone  | text |    9876543210    |
+| address | text |    Kathmandu     |
+|  photo  | file | NCE080BCT001.jpg |
 ```
 
 ### PUT `/` : input
