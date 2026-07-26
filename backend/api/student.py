@@ -1,6 +1,9 @@
+import cv2
+import numpy as np
 from flask import Blueprint, jsonify, request
 from database.database import SessionLocal
 from database.crud import (get_all_student, get_embedding_status, get_class_name, get_student, delete_student, create_student, get_class_id)
+from services.embedding_service import registration_service
 
 student_bp = Blueprint("student", __name__)
 
@@ -60,18 +63,36 @@ def add_student():
 	db = SessionLocal()
 
 	try:
-		details = request.get_json()
+		# details = request.get_json()
+		details = request.form.to_dict()
 
-		roll = details["rollno"]
-		if get_student(db, roll):
+		file = request.files.get("photo")
+		if file is None:
+			return jsonify({"message": "Photo is required."}), 400
+
+		image_name = details["rollno"]
+    
+		image_bytes = np.frombuffer(file.read(), np.uint8)
+		photo = cv2.imdecode(image_bytes, cv2.IMREAD_COLOR)
+
+		if photo is None:
+			return jsonify({"message": "Invalid image."}), 400
+
+		if get_student(db, image_name):
 			return jsonify({"message": "Student with this roll number already exists!"})
 
 		create_student(db, details)
+		registration_service(db, photo, image_name)
 
 		return jsonify({"message": "Student created successfully!"})
 	
 	except Exception as e:
-		return jsonify({"message": "An error occurred while creating the student."})
+		db.rollback()
+		print(e)
+		return jsonify({"message": str(e)}), 500
+
+	finally:
+		db.close()
 
 @student_bp.route("/", methods=["PUT"])
 def update_student():
