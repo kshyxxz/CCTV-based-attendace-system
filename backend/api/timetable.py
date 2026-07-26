@@ -21,7 +21,7 @@ def get_timetable_by_id(class_name):
 		return jsonify({"error": f"{e}"})
 	
 @timetable_bp.route("/<class_name>/create", methods=["POST"])
-def add_timetable():
+def add_timetable(class_name):
 	db = SessionLocal()
 
 	try:
@@ -34,7 +34,7 @@ def add_timetable():
 	except Exception as e:
 		return jsonify({"error": f"{e}"})
 
-@timetable_bp.route("/<class_name>/", methods=["PUT"])
+@timetable_bp.route("/<class_name>", methods=["PUT"])
 def update_timetable(class_name):
 	db = SessionLocal()
 
@@ -48,7 +48,13 @@ def update_timetable(class_name):
 		if not timetable:
 			return jsonify({"error": "Timetable not found!"})
 
-		timetable.subject_id = get_subject_by_code(db, subject_code).subject_id
+		subject = get_subject_by_code(db, subject_code)
+
+		if not subject:
+			return jsonify({"error": "Subject not found"}), 404
+
+		timetable.subject_id = subject.subject_id
+		
 		db.commit()
 
 		return jsonify({"message": "Timetable updated successfully!"})
@@ -56,7 +62,7 @@ def update_timetable(class_name):
 	except Exception as e:
 		return jsonify({"error": f"{e}"})
 
-@timetable_bp.route("/<class_name>/", methods=["DELETE"])
+@timetable_bp.route("/<class_name>", methods=["DELETE"])
 def delete_timetables(class_name):
 	db = SessionLocal()
 
