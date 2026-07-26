@@ -1,188 +1,317 @@
-/* ==========================================================================
-   TIMETABLE PAGE WRAPPER 
-   ========================================================================== */
-.page-container {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  font-family:
-    "Poppins",
-    system-ui,
-    -apple-system,
-    sans-serif;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* ==========================================================================
-   TOP HEADER BAR
-   ========================================================================== */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #e2e8f0;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.page-title {
-  margin: 0;
-  font-size: 1.85rem;
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: -0.02em;
-}
-
-.page-subtitle {
-  margin: 6px 0 0 0;
-  font-size: 0.9rem;
-  color: #64748b;
-}
-
-/* ==========================================================================
-   TOOLBAR & DROPDOWN CONTROLS
-   ========================================================================== */
-.timetable-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  background-color: #ffffff;
-  padding: 16px 20px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
-}
-
-.class-select-dropdown {
-  padding: 10px 16px;
-  font-family: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #0f172a;
+.timetable-page {
+  padding: 24px 32px;
   background-color: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  outline: none;
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  min-height: 100vh;
 }
 
-.class-select-dropdown:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+.timetable-header .title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
 }
 
-.academic-year-text {
-  font-size: 0.85rem;
-  font-weight: 500;
+.timetable-header .subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.timetable-toolbar {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.select-label {
+  font-size: 13px;
+  font-weight: 600;
   color: #64748b;
 }
 
-/* ==========================================================================
-   TIMETABLE GRID & TABLE CONTAINER
-   ========================================================================== */
-.timetable-grid-wrapper {
+.class-dropdown {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  outline: none;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.academic-label {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.btn-add-period {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.timetable-card-container {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  overflow-x: auto; /* Handles horizontal scrolling when many time slots exist */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Horizontal Table Grid */
+.timetable-grid {
+  display: grid;
+  gap: 10px;
+  align-items: center;
+}
+
+.grid-header-cell {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  padding: 10px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+}
+
+.grid-day-cell {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.grid-slot-cell {
+  height: 60px;
+  border-radius: 10px;
+  background-color: #fafafa;
+  border: 1px dashed #e2e8f0;
+}
+
+/* Subject Card with Clean, Minimalist Delete Button */
+.subject-card {
+  height: 100%;
+  border-radius: 10px;
   background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.subject-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0ea5e9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Small Delete Icon Button */
+.btn-delete-small {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 10px;
+  padding: 4px;
+  cursor: pointer;
+  opacity: 0.2;
+  width: 25%;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.subject-card:hover .btn-delete-small {
+  opacity: 1;
+}
+
+/* Modal Overlay & Form */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: #ffffff;
   padding: 24px;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form-field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.form-field input,
+.form-field select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.btn-close {
+  background: #f1f5f9;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-save {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.table-responsive {
+  width: 100%;
   overflow-x: auto;
 }
 
-.timetable-grid {
+.routine-table {
   width: 100%;
   border-collapse: separate;
-  border-spacing: 10px;
-  min-width: 750px;
+  border-spacing: 8px; /* Keeps the clean separated card look */
+  table-layout: fixed;
 }
 
-.timetable-grid th {
-  background-color: #f8fafc;
-  color: #475569;
-  font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 14px;
-  text-align: center;
-  border-radius: 10px;
-  border: 1px solid #edf2f7;
-}
-
-.time-slot-cell {
-  font-size: 0.8rem;
-  font-weight: 600;
+.day-header-th {
+  width: 130px;
+  background-color: #f1f5f9;
   color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 8px;
   text-align: center;
-  white-space: nowrap;
-  padding: 0 12px;
+}
+
+.time-header-th {
+  background-color: #f1f5f9;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.day-name-td {
   background-color: #f8fafc;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
   border-radius: 10px;
-  border: 1px solid #edf2f7;
+  height: 60px;
 }
 
-/* ==========================================================================
-   SCHEDULE SLOT CARDS
-   ========================================================================== */
-.slot-card {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 12px 14px;
-  min-height: 64px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+.routine-td {
+  height: 60px;
+  padding: 0;
+  vertical-align: middle;
 }
 
-.slot-card:not(.empty):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.05);
-}
-
-.slot-card.empty {
+.empty-td {
   background-color: #fafafa;
   border: 1px dashed #e2e8f0;
-  align-items: center;
-  color: #cbd5e1;
-  font-weight: 500;
+  border-radius: 10px;
 }
 
-.slot-subject {
-  font-weight: 600;
-  font-size: 0.875rem;
-  line-height: 1.2;
-}
-
-.slot-teacher {
-  font-size: 0.75rem;
-  color: #64748b;
-  font-weight: 400;
-}
-
-/* ==========================================================================
-   LOADING STATE
-   ========================================================================== */
-.loading-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 48px;
+/* Subject Block inside table cell */
+.filled-td .subject-card {
+  height: 100%;
+  border-radius: 10px;
   background-color: #ffffff;
-  border-radius: 16px;
   border: 1px solid #e2e8f0;
-  color: #64748b;
-  font-size: 0.95rem;
-  font-weight: 500;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.subject-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0ea5e9;
+  white-space: normal; /* Allows multi-line text for longer course titles */
+  word-break: break-word;
+}
+
+.btn-delete-small {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 10px;
+  padding: 4px;
+  cursor: pointer;
+  opacity: 0.2;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.subject-card:hover .btn-delete-small {
+  opacity: 1;
 }

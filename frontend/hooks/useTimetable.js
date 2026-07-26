@@ -1,156 +1,87 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { timetableService } from "../services/timetableServices";
+import { classService } from "../services/classesServices";
 
 export function useTimetable() {
-  const [selectedClass, setSelectedClass] = useState("Grade 10 - A");
-  const [schedule, setSchedule] = useState([]);
+  const [classesList, setClassesList] = useState([]);
+  const [selectedClass, setSelectedClass] = useState("");
+  const [schedule, setSchedule] = useState({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const fetchTimetable = async () => {
+  // 1. Fetch available classes on mount using getClasses()
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const classesData = await classService.getClasses();
+        // Handle array response or nested object response
+        const list = Array.isArray(classesData)
+          ? classesData
+          : classesData.classes || [];
+
+        setClassesList(list);
+
+        // Automatically select the first class if none selected yet
+        if (list.length > 0 && !selectedClass) {
+          const firstClassName =
+            typeof list[0] === "string"
+              ? list[0]
+              : list[0].class_name || list[0].name;
+          setSelectedClass(firstClassName);
+        }
+      } catch (err) {
+        console.error("Failed to load classes for dropdown:", err);
+      }
+    };
+
+    fetchClasses();
+  }, []);
+
+  // 2. Fetch timetable schedule whenever selectedClass changes
+  const fetchTimetable = useCallback(async () => {
+    if (!selectedClass) return;
     try {
       setLoading(true);
+      setError(null);
       const data = await timetableService.getTimetableByClass(selectedClass);
-      setSchedule(data || []);
+      setSchedule(data || {});
     } catch (err) {
-      // Mock timetable schedule matrix
-      setSchedule([
-        {
-          time: "08:00-09:00",
-          Monday: {
-            subject: "Mathematics",
-            teacher: "Mehta",
-            color: "#38bdf8",
-          },
-          Tuesday: {
-            subject: "English Literature",
-            teacher: "Nair",
-            color: "#f59e0b",
-          },
-          Wednesday: { subject: "Physics", teacher: "Kumar", color: "#a855f7" },
-          Thursday: { subject: "History", teacher: "Menon", color: "#ec4899" },
-          Friday: {
-            subject: "Computer Science",
-            teacher: "Iyer",
-            color: "#38bdf8",
-          },
-        },
-        {
-          time: "09:00-10:00",
-          Monday: { subject: "Physics", teacher: "Kumar", color: "#a855f7" },
-          Tuesday: {
-            subject: "Computer Science",
-            teacher: "Iyer",
-            color: "#38bdf8",
-          },
-          Wednesday: {
-            subject: "Mathematics",
-            teacher: "Mehta",
-            color: "#38bdf8",
-          },
-          Thursday: {
-            subject: "English Literature",
-            teacher: "Nair",
-            color: "#f59e0b",
-          },
-          Friday: { subject: "History", teacher: "Menon", color: "#ec4899" },
-        },
-        {
-          time: "10:15-11:15",
-          Monday: {
-            subject: "English Literature",
-            teacher: "Nair",
-            color: "#f59e0b",
-          },
-          Tuesday: {
-            subject: "Mathematics",
-            teacher: "Mehta",
-            color: "#38bdf8",
-          },
-          Wednesday: {
-            subject: "Computer Science",
-            teacher: "Iyer",
-            color: "#38bdf8",
-          },
-          Thursday: { subject: "Physics", teacher: "Kumar", color: "#a855f7" },
-          Friday: {
-            subject: "Mathematics",
-            teacher: "Mehta",
-            color: "#38bdf8",
-          },
-        },
-        {
-          time: "11:15-12:15",
-          Monday: {
-            subject: "Computer Science",
-            teacher: "Iyer",
-            color: "#38bdf8",
-          },
-          Tuesday: { subject: "History", teacher: "Menon", color: "#ec4899" },
-          Wednesday: {
-            subject: "English Literature",
-            teacher: "Nair",
-            color: "#f59e0b",
-          },
-          Thursday: {
-            subject: "Mathematics",
-            teacher: "Mehta",
-            color: "#38bdf8",
-          },
-          Friday: { subject: "Physics", teacher: "Kumar", color: "#a855f7" },
-        },
-        {
-          time: "13:00-14:00",
-          Monday: { subject: "History", teacher: "Menon", color: "#ec4899" },
-          Tuesday: { subject: "Physics", teacher: "Kumar", color: "#a855f7" },
-          Wednesday: {
-            subject: "Mathematics",
-            teacher: "Mehta",
-            color: "#38bdf8",
-          },
-          Thursday: {
-            subject: "Computer Science",
-            teacher: "Iyer",
-            color: "#38bdf8",
-          },
-          Friday: {
-            subject: "English Literature",
-            teacher: "Nair",
-            color: "#f59e0b",
-          },
-        },
-        {
-          time: "14:00-15:00",
-          Monday: {
-            subject: "Mathematics",
-            teacher: "Mehta",
-            color: "#38bdf8",
-          },
-          Tuesday: {
-            subject: "Computer Science",
-            teacher: "Iyer",
-            color: "#38bdf8",
-          },
-          Wednesday: { subject: "History", teacher: "Menon", color: "#ec4899" },
-          Thursday: {
-            subject: "English Literature",
-            teacher: "Nair",
-            color: "#f59e0b",
-          },
-          Friday: {
-            subject: "Mathematics",
-            teacher: "Mehta",
-            color: "#38bdf8",
-          },
-        },
-      ]);
+      // If a class has no schedule/periods created yet, keep schedule empty
+      setSchedule({});
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedClass]);
 
   useEffect(() => {
     fetchTimetable();
-  }, [selectedClass]);
+  }, [fetchTimetable]);
 
-  return { selectedClass, setSelectedClass, schedule, loading };
+  const addPeriod = async (payload) => {
+    await timetableService.createPeriod(selectedClass, payload);
+    await fetchTimetable();
+  };
+
+  const updatePeriod = async (payload) => {
+    await timetableService.updatePeriod(selectedClass, payload);
+    await fetchTimetable();
+  };
+
+  const deletePeriod = async (timetableId) => {
+    await timetableService.deletePeriod(selectedClass, timetableId);
+    await fetchTimetable();
+  };
+
+  return {
+    classesList,
+    selectedClass,
+    setSelectedClass,
+    schedule,
+    loading,
+    error,
+    refreshTimetable: fetchTimetable,
+    addPeriod,
+    updatePeriod,
+    deletePeriod,
+  };
 }
