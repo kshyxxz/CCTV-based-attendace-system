@@ -1,3 +1,6 @@
+/* ==========================================
+   Base Layout & Container Styles
+   ========================================== */
 .student-container {
   display: flex;
   flex-direction: column;
@@ -32,12 +35,19 @@
   border-radius: 10px;
   font-weight: 500;
   cursor: pointer;
+  width: 25%;
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 25%;
 }
 
+.btn-add:hover {
+  background-color: #1d4ed8;
+}
+
+/* ==========================================
+   Search & Filter Bar
+   ========================================== */
 .filter-bar {
   display: flex;
   justify-content: space-between;
@@ -65,8 +75,12 @@
   border-radius: 10px;
   outline: none;
   font-size: 0.875rem;
+  box-sizing: border-box;
 }
 
+/* ==========================================
+   Table & Student List Styles
+   ========================================== */
 .table-responsive {
   background: white;
   border-radius: 16px;
@@ -116,16 +130,16 @@
   font-size: 0.75rem;
   color: #64748b;
 }
-/* Append these rules to the bottom of your Students.css file */
 
 .text-center {
   text-align: center;
 }
 
+/* Action Buttons (Table) */
 .btn-delete {
   background: transparent;
   border: none;
-  color: #ef4444; /* Standard red-danger tone */
+  color: #ef4444;
   cursor: pointer;
   padding: 6px;
   border-radius: 6px;
@@ -137,16 +151,15 @@
 }
 
 .btn-delete:hover {
-  background-color: #fee2e2; /* Smooth red background highlight on hover */
+  background-color: #fee2e2;
   color: #b91c1c;
   transform: scale(1.05);
 }
-/* Append these rules to the bottom of your Students.css file */
 
 .btn-edit {
   background: transparent;
   border: none;
-  color: #3b82f6; /* Accent primary blue */
+  color: #3b82f6;
   cursor: pointer;
   padding: 6px;
   border-radius: 6px;
@@ -158,12 +171,12 @@
 }
 
 .btn-edit:hover {
-  background-color: #dbeafe; /* Light blue highlight on hover */
+  background-color: #dbeafe;
   color: #1d4ed8;
   transform: scale(1.05);
 }
 
-/* Embed Badges Styles */
+/* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -178,138 +191,171 @@
   background: #fef3c7;
   color: #d97706;
 }
+
 .badge.pending .dot {
   background: #d97706;
 }
+
 .badge.completed {
   background: #dcfce7;
   color: #16a34a;
 }
+
 .badge.completed .dot {
   background: #16a34a;
 }
+
 .dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
 }
 
-/* Attendance Bar Components */
-.attendance-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.progress-bar-container {
-  width: 80px;
-  height: 6px;
+/* Status / Utility Classes */
+.status-message {
+  padding: 12px;
+  border-radius: 8px;
   background-color: #f1f5f9;
-  border-radius: 9999px;
-  overflow: hidden;
+  color: #475569;
 }
 
-.progress-bar {
-  height: 100%;
-  background-color: #2563eb;
+.status-message.error-text {
+  background-color: #fee2e2;
+  color: #b91c1c;
 }
 
-/* Modal Form Styles */
+.text-muted {
+  color: #64748b;
+}
+
+/* ==========================================
+   Modal Backdrop & Popup Form Layout (Fixed)
+   ========================================== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  /* max-height: 90vh; */
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(5px);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
-  padding: 24px;
   align-items: center;
   justify-content: center;
-  z-index: 100;
+  padding: 16px;
+  z-index: 1000;
 }
 
 .modal-content {
-  background: white;
+  background: #ffffff;
   border-radius: 16px;
-
-  padding: 0px 24px 10px 24px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 24px 28px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 }
 
 .modal-header h2 {
   font-size: 1.25rem;
+  font-weight: 700;
   text-align: center;
   color: #0f172a;
-}
-*/ .btn-close {
-  background: none;
-  border: none;
-  font-size: 1.1rem;
-  color: #94a3b8;
-  cursor: pointer;
+  margin-top: 0;
+  margin-bottom: 16px;
 }
 
 .modal-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
+
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
+
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
 }
+
 .form-group label {
-  font-size: 0.815rem;
-  font-weight: 500;
+  font-size: 0.8125rem;
+  font-weight: 600;
   color: #475569;
 }
 
 .form-group input,
 .form-group select {
-  padding: 10px 14px;
-  border: 1px solid #e2e8f0;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   outline: none;
   font-size: 0.875rem;
+  color: #1e293b;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 /* Photo Uploader Styles */
 .photo-upload-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
+
 .photo-upload-label {
   cursor: pointer;
 }
+
 .photo-preview {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #2563eb;
 }
 
 .photo-placeholder {
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   border: 2px dashed #cbd5e1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 2px;
   color: #64748b;
   font-size: 0.65rem;
   text-align: center;
   padding: 4px;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.photo-placeholder:hover {
+  border-color: #2563eb;
+  color: #2563eb;
 }
 
 .camera-icon {
@@ -317,28 +363,50 @@
   color: #94a3b8;
 }
 
+.photo-placeholder:hover .camera-icon {
+  color: #2563eb;
+}
+
+/* Modal Footer Actions */
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
   gap: 12px;
   margin-top: 12px;
+  width: 100%;
+}
+
+.btn-cancel,
+.btn-submit {
+  flex: 1;
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease;
+  text-align: center;
 }
 
 .btn-cancel {
   background: #f1f5f9;
   color: #475569;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
 }
+
+.btn-cancel:hover {
+  background: #e2e8f0;
+}
+
 .btn-submit {
   background: #2563eb;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
+  color: #ffffff;
+}
+
+.btn-submit:hover {
+  background: #1d4ed8;
+}
+
+.btn-submit:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
 }
