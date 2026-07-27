@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { studentService } from "../../../services/studentServices";
+import ImageUploader from "./ImageUploader";
 
 export default function StudentForm({ studentData, onClose, refreshStudents }) {
   const isEditMode = !!studentData;
 
   const [classList, setClassList] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
+  const [selectedFile, setSelectedFile] = useState(null); // Raw file for POST request
 
   const [formData, setFormData] = useState({
     rollno: "",
@@ -16,17 +18,14 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
     address: "",
   });
 
-  // 1. Fetch created classes dynamically from API
   useEffect(() => {
     const fetchClassOptions = async () => {
       try {
         setLoadingClasses(true);
         const classesData = await studentService.getClasses();
-        // Extract class_name list from response array
         const names = (classesData || []).map((c) => c.class_name);
         setClassList(names);
 
-        // Set default class if not editing
         if (!studentData && names.length > 0) {
           setFormData((prev) => ({ ...prev, class_name: names[0] }));
         }
@@ -40,7 +39,6 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
     fetchClassOptions();
   }, [studentData]);
 
-  // 2. Populate form fields if editing existing student
   useEffect(() => {
     if (studentData) {
       const nameParts = (studentData.name || "").trim().split(" ");
@@ -66,6 +64,11 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
     }));
   };
 
+  // Catch the raw File object emitted by ImageUploader
+  const handleImageSelect = (file) => {
+    setSelectedFile(file);
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!formData.class_name) {
@@ -74,19 +77,26 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
     }
 
     try {
-      const payload = {
-        rollno: formData.rollno,
-        fname: formData.fname,
-        lname: formData.lname,
-        class_name: formData.class_name,
-        phone: formData.phone,
-        address: formData.address,
-      };
-
       if (isEditMode) {
-        await studentService.updateStudent(payload);
+        // Edit mode expects JSON payload
+        await studentService.updateStudent(formData);
       } else {
-        await studentService.saveStudent(payload);
+        // Creation mode expects multipart/form-data
+        if (!selectedFile) {
+          alert("Please upload a student photo.");
+          return;
+        }
+
+        const formDataPayload = new FormData();
+        formDataPayload.append("rollno", formData.rollno);
+        formDataPayload.append("fname", formData.fname);
+        formDataPayload.append("lname", formData.lname);
+        formDataPayload.append("class_name", formData.class_name);
+        formDataPayload.append("phone", formData.phone);
+        formDataPayload.append("address", formData.address);
+        formDataPayload.append("photo", selectedFile); // Attach the file under key 'photo'
+
+        await studentService.saveStudent(formDataPayload);
       }
 
       await refreshStudents();
@@ -104,6 +114,9 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
         </div>
 
         <form onSubmit={handleFormSubmit} className="modal-form">
+          {/* Hide photo upload during edit mode since backend PUT route doesn't process photo files */}
+          {!isEditMode && <ImageUploader onImageSelect={handleImageSelect} />}
+
           <div className="form-group">
             <label>Roll Number</label>
             <input
