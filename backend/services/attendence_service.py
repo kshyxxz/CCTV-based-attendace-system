@@ -33,7 +33,7 @@ def attendance_service(db, matched_students):
 
 		rollno = matched_student
 
-		date = now.date()
+		date = now.date().isoformat()
 
 		day =	now.strftime("%A")
 

@@ -54,7 +54,7 @@ def get_all_embeddings(db: Session):
 	return db.query(Embedding).all()
 
 def mark_attendance(db: Session, rollno: str, attendance_date: str, subject_id: int, status="Present"):
-	attendance = Attendance(rollno=rollno, attendance_date=attendance_date, subject=subject_id, status=status)
+	attendance = Attendance(rollno=rollno, attendance_date=attendance_date, subject_id=subject_id, status=status)
 
 	db.add(attendance)
 	db.commit()
@@ -76,10 +76,13 @@ def get_attendance_status(db: Session, rollno: str, date: str, subject_id: int):
 	return (
 		db.query(Attendance).filter(
 			Attendance.rollno == rollno,
-			Attendance.subject == subject_id,
+			Attendance.subject_id == subject_id,
 			Attendance.attendance_date == date
 		).first()
 	)
+
+def get_attendances(db: Session):
+	return db.query(Attendance).all()
 
 #		classes
 
