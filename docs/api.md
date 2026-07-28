@@ -358,3 +358,35 @@ use /timetable as url prefix
 	"timetable_id": "1"
 }
 ```
+
+## Attendance API:
+
+use /attendance as url prefix
+
+### GET `/` : output
+
+```json
+[
+	{
+		"attendance_date": "2026-07-27",
+		"rollno": "NCE080BCT020",
+		"status": "Present",
+		"student_name": "Kshitiz Shrestha",
+		"subject_name": "Artificial Intelligence"
+	},
+	{
+		"attendance_date": "2026-07-28",
+		"rollno": "NCE080BCT020",
+		"status": "Present",
+		"student_name": "Kshitiz Shrestha",
+		"subject_name": "Data Com"
+	},
+	{
+		"attendance_date": "2026-07-28",
+		"rollno": "NCE080BCT022",
+		"status": "Present",
+		"student_name": "Loblesh Bhartal",
+		"subject_name": "Data Com"
+	}
+]
+```

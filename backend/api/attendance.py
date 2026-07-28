@@ -1,16 +1,23 @@
-from datetime import date
-
 from flask import Blueprint, jsonify, request
-
+from database.crud import get_attendances, get_subject, get_student
 from database.database import SessionLocal
-from services.dashboard_service import get_dashboard_summary
 
 attendance_bp = Blueprint("attendance", __name__)
 
-@attendance_bp.route("/summary", methods=["GET"])
-def summary():
+@attendance_bp.route("/", methods=["GET"])
+def get_attendance():
 	db = SessionLocal()
 
-	todays_date = date.today()
+	try:
+		attendances = get_attendances(db)
 
-	return jsonify(get_dashboard_summary(db, todays_date))
+		return jsonify([{
+			"attendance_date": attendance.attendance_date.isoformat(),
+			"rollno": attendance.rollno,
+			"status": attendance.status,
+			"subject_name": get_subject(db, attendance.subject_id).subject_name,
+			"student_name": f"{get_student(db, attendance.rollno).fname} {get_student(db, attendance.rollno).lname}"
+		} for attendance in attendances])
+	
+	except Exception as e:
+		return jsonify({"error": f"{e}"}), 500
