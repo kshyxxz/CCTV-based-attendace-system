@@ -46,7 +46,7 @@ function Students() {
           <FaSearch className="search-icon" />
           <input
             type="text"
-            placeholder="Search by name, roll no, class, or address..."
+            placeholder="Search by name, roll no or address"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

@@ -1,33 +1,21 @@
-// services/attendanceServices.js
 import { BASE_URL, handleResponse } from "./api";
 
 export const attendanceService = {
-  // Fetch paginated and filtered attendance logs
-  getRecords: async (page, filters) => {
-    const params = new URLSearchParams({
-      page: page,
-      limit: 10,
-      date: filters.date,
-      subject: filters.subject,
-      status: filters.status,
-      q: filters.search,
-    });
+  // Fetch attendance records with trailing slash to prevent CORS redirect errors
+  getRecords: async (filters = {}) => {
+    const params = new URLSearchParams();
 
-    return fetch(`${BASE_URL}/attendance?${params.toString()}`, {
+    if (filters.date) params.append("date", filters.date);
+    if (filters.subject && filters.subject !== "All") {
+      params.append("subject", filters.subject);
+    }
+
+    const queryString = params.toString();
+    const url = `${BASE_URL}/attendance/${queryString ? `?${queryString}` : ""}`;
+
+    return fetch(url, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }).then(handleResponse);
-  },
-
-  // Generates download or export endpoint URL
-  getExportUrl: (format, filters) => {
-    const params = new URLSearchParams({
-      format,
-      date: filters.date,
-      subject: filters.subject,
-      status: filters.status,
-      q: filters.search,
-    });
-    return `${BASE_URL}/attendance/export?${params.toString()}`;
   },
 };
