@@ -1,20 +1,37 @@
-import { FaSearch } from "react-icons/fa";
+// AttendanceFilters.jsx
+import { useState, useEffect } from "react";
+import { subjectService } from "../../../services/subjectServices"; // Adjust path as needed
 
-function AttendanceFilters({
-  filters,
-  setFilters,
-  searchQuery,
-  setSearchQuery,
-  handleSearchSubmit,
-}) {
+function AttendanceFilters({ filters, setFilters }) {
+  const [subjectsList, setSubjectsList] = useState([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        setLoadingSubjects(true);
+        const data = await subjectService.getSubjects();
+        // Extract subject names depending on array format (string[] or object[])
+        const names = (data || []).map((s) => s.subject_name || s.name || s);
+        setSubjectsList(names);
+      } catch (err) {
+        console.error("Failed to fetch subjects:", err);
+      } finally {
+        setLoadingSubjects(false);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
+
   const handleSelectChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
-    <form className="attendance-filters-bar" onSubmit={handleSearchSubmit}>
-      {/* Date Picker Input */}
+    <div className="attendance-filters-bar">
+      {/* Date Filter */}
       <div className="filter-input-wrapper">
         <input
           type="date"
@@ -32,34 +49,29 @@ function AttendanceFilters({
           className="filter-dropdown"
           value={filters.subject}
           onChange={handleSelectChange}
+          disabled={loadingSubjects}
         >
-          <option value="All">All Subjects</option>
-          <option value="AI & ML">AI & ML</option>
-          <option value="DBMS">DBMS</option>
-          <option value="Networks">Networks</option>
-          <option value="OS">OS</option>
-          <option value="SE">SE</option>
+          <option value="All">
+            {loadingSubjects ? "Loading Subjects..." : "All Subjects"}
+          </option>
+          {subjectsList.map((subject, index) => (
+            <option key={index} value={subject}>
+              {subject}
+            </option>
+          ))}
         </select>
       </div>
 
-      {/* Status Filter Dropdown */}
-      <div className="filter-input-wrapper">
-        <select
-          name="status"
-          className="filter-dropdown"
-          value={filters.status}
-          onChange={handleSelectChange}
+      {filters.date || filters.subject !== "All" ? (
+        <button
+          type="button"
+          className="btn-clear-filter"
+          onClick={() => setFilters({ date: "", subject: "All" })}
         >
-          <option value="All">All Status</option>
-          <option value="Present">Present</option>
-          <option value="Absent">Absent</option>
-        </select>
-      </div>
-
-      <button type="submit" className="btn-search-trigger">
-        Search
-      </button>
-    </form>
+          Reset Filters
+        </button>
+      ) : null}
+    </div>
   );
 }
 

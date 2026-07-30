@@ -23,36 +23,27 @@ function AttendanceTable({
               <th>Student Name</th>
               <th>Subject</th>
               <th>Date</th>
-              <th>Time</th>
-              <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {records.length === 0 ? (
               <tr>
-                <td colSpan="6" className="empty-table-state">
+                <td colSpan="4" className="empty-table-state">
                   No attendance records found matching your filters.
                 </td>
               </tr>
             ) : (
-              records.map((record) => (
-                <tr key={record.id}>
-                  <td className="cell-roll">{record.rollNo}</td>
-                  <td className="cell-name">{record.name}</td>
-                  <td className="cell-subject">{record.subject}</td>
+              records.map((record, idx) => (
+                <tr
+                  key={`${record.rollno}-${record.attendance_date}-${record.subject_name}-${idx}`}
+                >
+                  <td className="cell-roll">{record.rollno}</td>
+                  <td className="cell-name">{record.student_name}</td>
+                  <td className="cell-subject">{record.subject_name}</td>
                   <td className="cell-date">
                     <span className="date-badge">
                       <FaRegCalendarAlt className="calendar-icon-inline" />
-                      {record.date}
-                    </span>
-                  </td>
-                  <td className="cell-time">{record.time}</td>
-                  <td className="cell-status">
-                    <span
-                      className={`status-tag ${record.status.toLowerCase()}`}
-                    >
-                      <span className="tag-dot"></span>
-                      {record.status}
+                      {record.attendance_date}
                     </span>
                   </td>
                 </tr>
@@ -62,7 +53,7 @@ function AttendanceTable({
         </table>
       </div>
 
-      {/* Table Pagination / Records Counter Footer */}
+      {/* Table Pagination */}
       <div className="table-footer">
         <div className="records-counter">{totalRecords} records found</div>
         <div className="pagination-group">
