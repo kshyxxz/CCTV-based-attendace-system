@@ -19,9 +19,14 @@ def create_student(db: Session, data):
     return student
 
 def get_student(db: Session, rollno: str):
-	return (
-		db.query(Student).filter(Student.rollno == rollno).first()
-	)
+    if not rollno:
+        return None
+    clean_roll = rollno.strip()
+    return (
+        db.query(Student)
+        .filter(Student.rollno == clean_roll)
+        .first()
+    )
 
 def get_all_student(db: Session) -> list[Student]:
     return db.query(Student).all()
@@ -317,5 +322,3 @@ def get_subject_stats(db: Session, selected_date):
 		})
 
 	return result
-
-# def get_recent_logs(db: Session):

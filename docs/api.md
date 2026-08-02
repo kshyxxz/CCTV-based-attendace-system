@@ -390,3 +390,48 @@ use /attendance as url prefix
 	}
 ]
 ```
+### Recognition API:
+
+use /recognition as url prefix
+
+### POST `/` : input
+```json
+[
+	{
+    "image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ...",
+    "selectedClass": "Subject_Name"
+	}
+]
+```
+### POST `/` :output
+```json
+[
+	{
+    "success": true,
+    "detections": [
+        {
+            "box": [100, 60, 90, 110],
+            "recognized": true,
+            "rollno": "NCE080BCT002",
+            "similarity": 0.9452
+        }
+    ],
+    "logs": [
+        {
+            "accuracy": "94.5%",
+            "id": "log-1722428400-0",
+            "name": "Sanjay Khadka",
+            "roll": "NCE080BCT002",
+            "status": "Recognized",
+            "time": "04:35:15 PM"
+        }
+    ],
+    "stats": {
+        "detected": 1,
+        "fps": "24.5",
+        "recognized": 1,
+        "unknown": 0
+    }
+}
+]
+```
