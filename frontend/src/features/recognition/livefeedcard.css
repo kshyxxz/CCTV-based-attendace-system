@@ -1,0 +1,76 @@
+.livefeed-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+.livefeed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.livefeed-actions {
+  display: flex;
+  gap: 8px;
+}
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #f7f7f7;
+  cursor: pointer;
+}
+.btn-action span {
+  font-size: 13px;
+}
+.btn-danger {
+  background: #ffecec;
+  border-color: #f5c6cb;
+  color: #a94442;
+}
+.livefeed-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 420px;
+  overflow: auto;
+}
+.livefeed-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 6px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.item-left {
+  display: flex;
+  flex-direction: column;
+}
+.item-name {
+  font-weight: 600;
+}
+.item-roll {
+  font-size: 12px;
+  color: #666;
+}
+.item-right {
+  text-align: right;
+  margin-right: 12px;
+}
+.item-status.present {
+  color: #10b981;
+  font-weight: 600;
+}
+.item-status.unknown {
+  color: #ef4444;
+  font-weight: 600;
+}
+.item-accuracy {
+  min-width: 56px;
+  text-align: right;
+  color: #333;
+}

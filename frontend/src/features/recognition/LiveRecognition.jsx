@@ -1,4 +1,3 @@
-// LiveRecognition.jsx
 import { useCamera } from "../../../hooks/useCamera";
 import CameraPanel from "./CameraPanel";
 import LiveFeedCard from "./LiveFeedCard";
@@ -7,13 +6,17 @@ import "./liverecognition.css";
 function LiveRecognition() {
   const {
     isCameraActive,
-    searchQuery,
-    recognitionLogs,
+    searchQuery = "",
+    recognitionLogs = [],
     stats,
+    detections,
     handleStartCamera,
     handleCaptureSnapshot,
+    videoRef,
+    clearRecognitionLogs, // NEW
   } = useCamera();
 
+  // Keep filteredLogs for search in the side panel
   const filteredLogs = recognitionLogs.filter(
     (log) =>
       log.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -37,9 +40,15 @@ function LiveRecognition() {
           handleStartCamera={handleStartCamera}
           handleCaptureSnapshot={handleCaptureSnapshot}
           stats={stats}
+          videoRef={videoRef}
+          detections={detections}
         />
 
-        <LiveFeedCard filteredLogs={filteredLogs} />
+        <LiveFeedCard
+          recognitionLogs={recognitionLogs} // full logs
+          filteredLogs={filteredLogs} // filtered by search
+          clearRecognitionLogs={clearRecognitionLogs}
+        />
       </div>
     </div>
   );

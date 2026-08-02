@@ -1,11 +1,17 @@
-// CameraPanel.jsx
+// Made by Prashant
 import { FaVideo, FaCamera, FaStop } from "react-icons/fa";
+
+const BACKEND = "http://localhost:5000";
 
 function CameraPanel({
   isCameraActive,
   handleStartCamera,
   handleCaptureSnapshot,
   stats,
+  // videoRef and detections are kept in the prop signature for compatibility
+  // but are no longer used — boxes are drawn server-side on the MJPEG stream
+  videoRef,
+  detections = [],
 }) {
   return (
     <div className="video-panel">
@@ -30,19 +36,36 @@ function CameraPanel({
         </div>
       </div>
 
-      <div className={`video-screen ${isCameraActive ? "active" : "offline"}`}>
-        {isCameraActive ? (
-          <div className="video-placeholder-active">
-            <div className="stream-live-indicator">
-              <span className="live-dot"></span> LIVE
-            </div>
-            <p>Receiving Real-Time CCTV Feed Stream...</p>
+      <div
+        className={`video-screen ${isCameraActive ? "active" : "offline"}`}
+        style={{ position: "relative" }}
+      >
+        {/* MJPEG stream from backend — bounding boxes are burned in server-side */}
+        {isCameraActive && (
+          <img
+            id="mjpeg-feed"
+            src={`${BACKEND}/recognition/video_feed`}
+            alt="Live camera feed"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        )}
+
+        {isCameraActive && (
+          <div className="stream-live-indicator">
+            <span className="live-dot"></span> LIVE
           </div>
-        ) : (
+        )}
+
+        {!isCameraActive && (
           <div className="video-placeholder-offline">
             <FaCamera className="offline-camera-icon" />
             <h3>Camera is offline</h3>
-            <p>Click "Start Camera" to begin recognition</p>
+            <p>Click &quot;Start Camera&quot; to begin recognition</p>
           </div>
         )}
       </div>

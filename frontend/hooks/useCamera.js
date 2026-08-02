@@ -1,12 +1,12 @@
-// hooks/useCamera.js
-import { useState, useEffect } from "react";
-import { cameraService } from "../services/cameraServices";
+import { useState, useRef, useEffect } from "react";
+
+const BACKEND = "http://localhost:5000";
 
 export function useCamera() {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCamera] = useState("Main Hall Cam 1");
-  const [selectedClass] = useState("AI & ML");
+  const [selectedClass] = useState("");
   const [recognitionLogs, setRecognitionLogs] = useState([]);
   const [stats, setStats] = useState({
     detected: 0,
@@ -14,60 +14,70 @@ export function useCamera() {
     unknown: 0,
     fps: 0,
   });
+  const [detections, setDetections] = useState([]);
 
-  // Fetch initial session logs and metrics
+  // kept so CameraPanel's prop signature stays unchanged
+  const videoRef = useRef(null);
+
+  const clearRecognitionLogs = () => {
+    setRecognitionLogs([]);
+  };
+
+  // Poll real-time stream stats and logs from the backend
   useEffect(() => {
-    const fetchCurrentSessionData = async () => {
-      try {
-        const data = await cameraService.getSessionData(
-          selectedCamera,
-          selectedClass,
-        );
-        setRecognitionLogs(data.logs || []);
-        setStats(
-          data.stats || { detected: 0, recognized: 0, unknown: 0, fps: 0 },
-        );
-      } catch (error) {
-        console.error("Error fetching live session data:", error);
-
-        // Mock data fallback if backend is offline
-        setRecognitionLogs([]);
-        setStats({ detected: 3, recognized: 2, unknown: 1, fps: 0 });
-      }
-    };
-
-    fetchCurrentSessionData();
-  }, [selectedCamera, selectedClass]);
-
-  // Handle active stream loop / WebSocket triggers
-  useEffect(() => {
-    if (!isCameraActive) {
-      setStats((prev) => ({ ...prev, fps: 0 }));
-      return;
+    let intervalId;
+    if (isCameraActive) {
+      intervalId = setInterval(async () => {
+        try {
+          const res = await fetch(`${BACKEND}/recognition/state`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+              setStats(data.stats);
+              setRecognitionLogs(data.logs);
+            }
+          }
+        } catch (err) {
+          console.error("[useCamera] Error polling stream state:", err);
+        }
+      }, 1000);
+    } else {
+      setStats({ detected: 0, recognized: 0, unknown: 0, fps: 0 });
+      setDetections([]);
     }
 
-    // Simulated active feed frame refresh updates
-    setStats((prev) => ({ ...prev, fps: 30, detected: 6, recognized: 5 }));
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [isCameraActive]);
 
   const handleStartCamera = async () => {
-    try {
-      const nextState = !isCameraActive;
-      await cameraService.toggleCamera(selectedCamera, nextState);
-      setIsCameraActive(nextState);
-    } catch (error) {
-      console.error("Failed to toggle system camera state:", error);
-      setIsCameraActive(!isCameraActive); // Fallback toggle to test frontend offline
+    if (!isCameraActive) {
+      // Tell the backend to open the camera
+      try {
+        await fetch(`${BACKEND}/recognition/stream/start`, { method: "POST" });
+      } catch (err) {
+        console.error("[useCamera] Could not reach backend:", err);
+      }
+      setIsCameraActive(true);
+    } else {
+      // Tell the backend to stop the camera
+      try {
+        await fetch(`${BACKEND}/recognition/stream/stop`);
+      } catch (err) {
+        console.error("[useCamera] Could not reach backend:", err);
+      }
+      setIsCameraActive(false);
+      // Reset stats when stopped
+      setStats({ detected: 0, recognized: 0, unknown: 0, fps: 0 });
+      setDetections([]);
     }
   };
 
-  const handleCaptureSnapshot = async () => {
-    try {
-      await cameraService.captureSnapshot(selectedCamera);
-      alert("Snapshot event triggered and saved via API.");
-    } catch (error) {
-      console.error("Error capturing snapshot:", error);
-    }
+  // Snapshot: open the MJPEG feed URL in a new tab so the user can save it
+  const handleCaptureSnapshot = () => {
+    if (!isCameraActive) return;
+    window.open(`${BACKEND}/recognition/video_feed`, "_blank");
   };
 
   return {
@@ -78,7 +88,11 @@ export function useCamera() {
     selectedClass,
     recognitionLogs,
     stats,
+    detections,
     handleStartCamera,
     handleCaptureSnapshot,
+    videoRef,
+    clearRecognitionLogs,
   };
 }
+

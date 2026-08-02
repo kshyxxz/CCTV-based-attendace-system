@@ -6,6 +6,7 @@ from api.subject import subject_bp
 from api.classe import class_bp
 from api.timetable import timetable_bp
 from api.dashboard import dashboard_bp
+from api.recognition import recognition_bp
 
 app = Flask(__name__)
 
@@ -17,6 +18,7 @@ app.register_blueprint(class_bp, url_prefix="/classes")
 app.register_blueprint(timetable_bp, url_prefix="/timetable")
 app.register_blueprint(attendance_bp, url_prefix="/attendance")
 app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
+app.register_blueprint(recognition_bp, url_prefix="/recognition")
 
 @app.route('/')
 def intro():

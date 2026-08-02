@@ -1,50 +1,24 @@
+from database.crud import get_current_subject, get_attendance_status, mark_attendance, get_student_class
 from datetime import datetime
-from database.crud import mark_attendance, get_attendance_status, get_current_subject, get_student_class
 
-def attendance_service(db, matched_students):	 
+def attendance_service(db, matched_students):
+    date = datetime.now().date()
+    time_now = datetime.now().time()
+    day = datetime.now().strftime("%A")
 
-	now = datetime.now()
+    for rollno in matched_students:
+        class_id = get_student_class(db, rollno)
+        if not class_id:
+            continue
 
-	for matched_student in matched_students:  
-		"""
-		matches = [
-			{
-				"student": "NCE080BCT019",
-				"embedding_index": 0,
-				"similarity": 0.94,
-			},
-			{
-				"student": "NCE080BCT025",
-				"embedding_index": 3,
-				"similarity": 0.89,
-			},
-			{
-				"student": "Unknown",
-				"embedding_index": -1,
-				"similarity": 0.42,
-			},
-			{
-				"student": "NCE080BCT012",
-				"embedding_index": 1,
-				"similarity": 0.91,
-			},
-		]
-		"""
+        subject = get_current_subject(db, class_id, day, time_now)
 
-		rollno = matched_student
+        if subject is None:
+            # No subject scheduled at this time → skip or log
+            print(f"No subject found for class {class_id} at {day} {time_now}")
+            continue
 
-		date = now.date().isoformat()
-
-		day =	now.strftime("%A")
-
-		time = now.strftime("%H:%M:%S")
-
-		class_id = get_student_class(db, rollno)
-		subject = get_current_subject(db, class_id, day, time)
-
-		student_info = get_attendance_status(db, rollno, date, subject.subject_id)
-		if student_info is None:
-			mark_attendance(db, rollno, date, subject.subject_id)
-		else:
-			# print(f"{rollno} is already marked {student_info.status}")
-			pass
+        # Only proceed if subject exists
+        student_info = get_attendance_status(db, rollno, date, subject.subject_id)
+        if not student_info:
+            mark_attendance(db, rollno, date, subject.subject_id, status="Present")
