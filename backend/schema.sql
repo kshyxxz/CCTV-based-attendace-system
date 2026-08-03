@@ -2,17 +2,8 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE classes (
     class_id SERIAL PRIMARY KEY,
-    class_name VARCHAR(50) UNIQUE NOT NULL
-);
-
-CREATE TABLE class_camera_sources (
-    class_id INT PRIMARY KEY,
-    camera_source VARCHAR(255) NOT NULL,
-
-    CONSTRAINT fk_class_camera_source_class
-        FOREIGN KEY (class_id)
-        REFERENCES classes(class_id)
-        ON DELETE CASCADE
+    class_name VARCHAR(50) UNIQUE NOT NULL,
+    camera_source VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE subjects (
