@@ -5,6 +5,16 @@ CREATE TABLE classes (
     class_name VARCHAR(50) UNIQUE NOT NULL
 );
 
+CREATE TABLE class_camera_sources (
+    class_id INT PRIMARY KEY,
+    camera_source VARCHAR(255) NOT NULL,
+
+    CONSTRAINT fk_class_camera_source_class
+        FOREIGN KEY (class_id)
+        REFERENCES classes(class_id)
+        ON DELETE CASCADE
+);
+
 CREATE TABLE subjects (
     subject_id SERIAL PRIMARY KEY,
     subject_code VARCHAR(20) UNIQUE NOT NULL,

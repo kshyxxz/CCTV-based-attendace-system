@@ -9,7 +9,8 @@ from vision.facenet import load_facenet
 from vision.embedding import generate_embedding_for_group
 from vision.recognition import find_best_match
 
-from database.crud import get_all_embeddings, get_student
+from database.crud import get_all_embeddings, get_student, get_class_id
+from database.models import Student
 from services.attendence_service import attendance_service
 from config import THRESHOLD, FACE_CONFIDENCE, LOG_COOLDOWN_SECONDS
 
@@ -34,16 +35,26 @@ def decode_image(base64_str):
         print(f"Error decoding image: {e}")
         return None
 
-def process_frame(img, db, class_name=""):
+def process_frame(img, db, class_id=None, class_name=""):
     global RECENT_DETECTIONS
 
     if img is None:
         return {"detections": [], "logs": []}
 
+    if class_id is None and class_name:
+        class_id = get_class_id(db, class_name)
+
     current_timestamp = time.time()
 
     # 1. Fetch embeddings
     loaded_records = get_all_embeddings(db)
+    if class_id is not None:
+        class_rolls = {
+            student.rollno
+            for student in db.query(Student).filter(Student.class_id == class_id).all()
+        }
+        loaded_records = [record for record in loaded_records if record.rollno in class_rolls]
+
     roll_numbers = [item.rollno for item in loaded_records]
     stored_embeddings = [item.embedding for item in loaded_records]
 
@@ -108,6 +119,6 @@ def process_frame(img, db, class_name=""):
 
     # 4. Save to DB
     if matched_students:
-        attendance_service(db, matched_students)
+        attendance_service(db, matched_students, class_id=class_id)
 
     return {"detections": detections, "logs": logs}
