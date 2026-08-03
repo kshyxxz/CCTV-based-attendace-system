@@ -37,12 +37,30 @@ use /students as url prefix
 
 ```json
 {
-	"address": "Pokhara",
+	"address": "Gulmi",
+	"attendance_stats": [
+		{
+			"count": 0,
+			"subject": "Artificial Intelligence"
+		},
+		{
+			"count": 0,
+			"subject": "Data Communication"
+		},
+		{
+			"count": 0,
+			"subject": "Engineering Mathematics II"
+		},
+		{
+			"count": 1,
+			"subject": "Data Com"
+		}
+	],
 	"class_name": "A-101",
-	"embedding": false,
-	"name": "Sanjay Khadka",
-	"phone": "9841000002",
-	"rollno": "NCE080BCT002"
+	"embedding": true,
+	"name": "Loblesh Bhartal",
+	"phone": "9876543210",
+	"rollno": "NCE080BCT022"
 }
 ```
 
@@ -390,48 +408,52 @@ use /attendance as url prefix
 	}
 ]
 ```
+
 ### Recognition API:
 
 use /recognition as url prefix
 
 ### POST `/` : input
+
 ```json
 [
 	{
-    "image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ...",
-    "selectedClass": "Subject_Name"
+		"image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ...",
+		"selectedClass": "Subject_Name"
 	}
 ]
 ```
+
 ### POST `/` :output
+
 ```json
 [
 	{
-    "success": true,
-    "detections": [
-        {
-            "box": [100, 60, 90, 110],
-            "recognized": true,
-            "rollno": "NCE080BCT002",
-            "similarity": 0.9452
-        }
-    ],
-    "logs": [
-        {
-            "accuracy": "94.5%",
-            "id": "log-1722428400-0",
-            "name": "Sanjay Khadka",
-            "roll": "NCE080BCT002",
-            "status": "Recognized",
-            "time": "04:35:15 PM"
-        }
-    ],
-    "stats": {
-        "detected": 1,
-        "fps": "24.5",
-        "recognized": 1,
-        "unknown": 0
-    }
-}
+		"success": true,
+		"detections": [
+			{
+				"box": [100, 60, 90, 110],
+				"recognized": true,
+				"rollno": "NCE080BCT002",
+				"similarity": 0.9452
+			}
+		],
+		"logs": [
+			{
+				"accuracy": "94.5%",
+				"id": "log-1722428400-0",
+				"name": "Sanjay Khadka",
+				"roll": "NCE080BCT002",
+				"status": "Recognized",
+				"time": "04:35:15 PM"
+			}
+		],
+		"stats": {
+			"detected": 1,
+			"fps": "24.5",
+			"recognized": 1,
+			"unknown": 0
+		}
+	}
 ]
 ```

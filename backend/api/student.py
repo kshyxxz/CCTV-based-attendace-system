@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from flask import Blueprint, jsonify, request
 from database.database import SessionLocal
-from database.crud import (get_all_student, get_embedding_status, get_class_name, get_student, delete_student, create_student, get_class_id)
+from database.crud import (get_all_student, get_embedding_status, get_class_name, get_student, delete_student, create_student, get_class_id, get_student_attendance_stats)
 from services.embedding_service import registration_service
 
 student_bp = Blueprint("student", __name__)
@@ -46,14 +46,18 @@ def ret_student(rollno):
 
 		if not student:
 			return jsonify({"message": "Student does not exist!"})
+
+		stats = get_student_attendance_stats(db, rollno)
+		
 		return jsonify(
 			{
 				"rollno": student.rollno,
-                "name": f"{student.fname} {student.lname}",
+                "name": f"{student.fname} {student.lname}", 
                 "phone": student.phone,
                 "embedding": get_embedding_status(db, student.rollno),
                 "address": student.address,
                 "class_name": get_class_name(db, student.class_id),
+                "attendance_stats": stats
 		})
 	except Exception as e:
 		return jsonify({"message": "An error occurred while fetching the student."})

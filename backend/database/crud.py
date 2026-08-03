@@ -322,3 +322,18 @@ def get_subject_stats(db: Session, selected_date):
 		})
 
 	return result
+
+def get_student_attendance_stats(db: Session, rollno: str):
+
+	result = []
+
+	subjects = db.query(Subject).all()
+
+	for subject in subjects:
+		count = db.query(Attendance).filter(Attendance.subject_id == subject.subject_id, Attendance.rollno == rollno).count()
+		result.append({
+			"subject": subject.subject_name,
+			"count": count
+		})
+
+	return result
