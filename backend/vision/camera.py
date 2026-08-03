@@ -7,7 +7,7 @@ def load_video(video_path):
     return cap
 
 
-def load_camera(camera_source=0):
+def load_camera(camera_source: int | str = 0):
     """
     Accepts:
     - Integer (e.g., 0, 1) for local webcams
@@ -60,6 +60,9 @@ def extract_frame(cap, interval_seconds=1):
         if not ret:
             print("[CAMERA] Stream ended or connection lost.")
             break
+
+        if frame is None:
+            continue
 
         # Yield frame for face recognition at the specified interval
         if frame_count % frame_interval == 0:

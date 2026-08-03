@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from database.models import ( Student, Embedding, Attendance, Class, Subject, Timetable )
+from database.models import ( Student, Embedding, Attendance, Class, Subject, Timetable, ClassCameraSource )
 from datetime import time
 
 def create_student(db: Session, data):
@@ -19,12 +19,9 @@ def create_student(db: Session, data):
     return student
 
 def get_student(db: Session, rollno: str):
-    if not rollno:
-        return None
-    clean_roll = rollno.strip()
     return (
         db.query(Student)
-        .filter(Student.rollno == clean_roll)
+        .filter(Student.rollno == rollno)
         .first()
     )
 
@@ -101,6 +98,44 @@ def get_class_id(db: Session, class_name: str):
 def get_class_name(db: Session, class_id: int):
     class_obj = db.query(Class).filter(Class.class_id == class_id).first()
     return class_obj.class_name if class_obj else None
+
+def get_class_camera_source(db: Session, class_id: int, fallback=None):
+	mapping = (
+		db.query(ClassCameraSource)
+		.filter(ClassCameraSource.class_id == class_id)
+		.first()
+	)
+	if mapping:
+		return mapping.camera_source
+	return fallback
+
+def set_class_camera_source(db: Session, class_id: int, camera_source: str):
+	mapping = (
+		db.query(ClassCameraSource)
+		.filter(ClassCameraSource.class_id == class_id)
+		.first()
+	)
+
+	if mapping:
+		mapping.camera_source = camera_source  # type: ignore[assignment]
+	else:
+		mapping = ClassCameraSource(class_id=class_id, camera_source=camera_source)
+		db.add(mapping)
+
+	db.commit()
+	db.refresh(mapping)
+	return mapping
+
+def delete_class_camera_source(db: Session, class_id: int):
+	mapping = (
+		db.query(ClassCameraSource)
+		.filter(ClassCameraSource.class_id == class_id)
+		.first()
+	)
+
+	if mapping:
+		db.delete(mapping)
+		db.commit()
 
 def get_all_classes(db: Session):
 	return db.query(Class).all()
@@ -231,8 +266,9 @@ def get_class_timetable(db: Session, class_name: str):
 	grouped = defaultdict(list)
 
 	for entry in timetable:
+		subject = get_subject(db, entry.subject_id)
 		grouped[entry.day_of_week].append({
-			"subject_name": get_subject(db, entry.subject_id).subject_name,
+			"subject_name": subject.subject_name if subject else "",
 			"start_time": entry.start_time.isoformat(),
 			"end_time": entry.end_time.isoformat(),
 			"timetable_id": entry.timetable_id
@@ -274,9 +310,11 @@ def delete_timetable(db: Session, timetable_id: int):
 		db.delete(timetable)
 		db.commit()	
 
+from sqlalchemy import distinct
+
 def get_today_counts(db: Session, todays_date):
 	total = db.query(Student).count()
-	present = db.query(Attendance).filter(Attendance.attendance_date == todays_date, Attendance.status == "Present").count()
+	present = (db.query(distinct(Attendance.rollno)).filter(Attendance.attendance_date == todays_date, Attendance.status == "Present").count())
 
 	return {
 		"present": present,
@@ -326,8 +364,18 @@ def get_subject_stats(db: Session, selected_date):
 def get_student_attendance_stats(db: Session, rollno: str):
 
 	result = []
+	student_class_id = get_student_class(db, rollno)
 
-	subjects = db.query(Subject).all()
+	if student_class_id is None:
+		return result
+
+	subjects = (
+		db.query(Subject)
+		.join(Timetable, Subject.subject_id == Timetable.subject_id)
+		.filter(Timetable.class_id == student_class_id)
+		.distinct()
+		.all()
+	)
 
 	for subject in subjects:
 		count = db.query(Attendance).filter(Attendance.subject_id == subject.subject_id, Attendance.rollno == rollno).count()
