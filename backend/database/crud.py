@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from database.models import ( Student, Embedding, Attendance, Class, Subject, Timetable, ClassCameraSource )
+from database.models import ( Student, Embedding, Attendance, Class, Subject, Timetable )
 from datetime import time
 
 def create_student(db: Session, data):
@@ -100,48 +100,26 @@ def get_class_name(db: Session, class_id: int):
     return class_obj.class_name if class_obj else None
 
 def get_class_camera_source(db: Session, class_id: int, fallback=None):
-	mapping = (
-		db.query(ClassCameraSource)
-		.filter(ClassCameraSource.class_id == class_id)
-		.first()
-	)
-	if mapping:
-		return mapping.camera_source
+	class_obj = get_class(db, class_id)
+	if class_obj is not None:
+		source = class_obj.camera_source
+		if source not in (None, ""):
+			return source
 	return fallback
-
-def set_class_camera_source(db: Session, class_id: int, camera_source: str):
-	mapping = (
-		db.query(ClassCameraSource)
-		.filter(ClassCameraSource.class_id == class_id)
-		.first()
-	)
-
-	if mapping:
-		mapping.camera_source = camera_source  # type: ignore[assignment]
-	else:
-		mapping = ClassCameraSource(class_id=class_id, camera_source=camera_source)
-		db.add(mapping)
-
-	db.commit()
-	db.refresh(mapping)
-	return mapping
-
-def delete_class_camera_source(db: Session, class_id: int):
-	mapping = (
-		db.query(ClassCameraSource)
-		.filter(ClassCameraSource.class_id == class_id)
-		.first()
-	)
-
-	if mapping:
-		db.delete(mapping)
-		db.commit()
 
 def get_all_classes(db: Session):
 	return db.query(Class).all()
 
 def create_class(db, data):
-	classe = Class(**data)
+	class_name = data.get("class_name")
+	camera_source = data.get("camera_source")
+
+	if not class_name:
+		raise ValueError("class_name is required.")
+	if not camera_source:
+		raise ValueError("camera_source is required.")
+
+	classe = Class(class_name=class_name, camera_source=camera_source)
 	db.add(classe)
 	db.commit()
 	db.refresh(classe)
@@ -150,6 +128,7 @@ def create_class(db, data):
 def update_class(db, data):
 	class_name = data.get("class_name")
 	new_class_name = data.get("new_class_name")
+	new_camera_source = data.get("camera_source")
 
 	class_id = get_class_id(db, class_name)
 
@@ -158,8 +137,19 @@ def update_class(db, data):
 	if not classe:
 		raise ValueError("Class does not exist.")
 
-	if class_name:
-		classe.class_name = new_class_name
+	updates = {}
+	if new_class_name:
+		updates[Class.class_name] = new_class_name
+	if "camera_source" in data:
+		if not new_camera_source:
+			raise ValueError("camera_source is required.")
+		updates[Class.camera_source] = new_camera_source
+
+	if updates:
+		db.query(Class).filter(Class.class_id == classe.class_id).update(
+			updates,
+			synchronize_session=False,
+		)
 
 	db.commit()
 	db.refresh(classe)

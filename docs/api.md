@@ -107,25 +107,29 @@ use /classes as url prefix
 | Method | Endpoint |   Description   |
 | :----: | :------: | :-------------: |
 |  GET   |   `/`    | Get all classes |
-|  POST  |   `/`    |  Create classs  |
-|  PUT   |   `/`    |  Update classs  |
-| DELETE |   `/`    |  Delete classs  |
+|  POST  |   `/`    |  Create class   |
+|  PUT   |   `/`    |  Update class   |
+| DELETE |   `/`    |  Delete class   |
 
 ### GET `/` : output
 
 ```json
 [
 	{
-		"class_name": "A-101"
+		"class_name": "A-101",
+		"camera_source": "0"
 	},
 	{
-		"class_name": "A-103"
+		"class_name": "A-103",
+		"camera_source": "rtsp://192.168.1.50:554/stream"
 	},
 	{
-		"class_name": "A-104"
+		"class_name": "A-104",
+		"camera_source": "0"
 	},
 	{
-		"class_name": "A-105"
+		"class_name": "A-105",
+		"camera_source": "0"
 	}
 ]
 ```
@@ -134,7 +138,8 @@ use /classes as url prefix
 
 ```json
 {
-	"class_name": "A-100"
+	"class_name": "A-100",
+	"camera_source": "0"
 }
 ```
 
@@ -143,7 +148,8 @@ use /classes as url prefix
 ```json
 {
 	"class_name": "A-100",
-	"new_class_name": "A-109"
+	"new_class_name": "A-109",
+	"camera_source": "rtsp://192.168.1.50:554/stream"
 }
 ```
 
@@ -152,52 +158,6 @@ use /classes as url prefix
 ```json
 {
 	"class_name": "A-100"
-}
-```
-
-## Class Camera Source APIs:
-
-use /classes as url prefix
-
-| Method |          Endpoint           |            Description             |
-| :----: | :-------------------------: | :--------------------------------: |
-|  GET   | `/<class_id>/camera-source` | Get the camera source for a class  |
-|  PUT   | `/<class_id>/camera-source` | Create or update class camera feed |
-| DELETE | `/<class_id>/camera-source` |  Remove the camera source mapping  |
-
-### GET `/<class_id>/camera-source` : output
-
-```json
-{
-	"class_id": 1,
-	"class_name": "A-101",
-	"camera_source": "0"
-}
-```
-
-### PUT `/<class_id>/camera-source` : input
-
-```json
-{
-	"camera_source": "rtsp://192.168.1.50:554/stream"
-}
-```
-
-### PUT `/<class_id>/camera-source` : output
-
-```json
-{
-	"message": "Camera source saved successfully!",
-	"class_id": 1,
-	"camera_source": "rtsp://192.168.1.50:554/stream"
-}
-```
-
-### DELETE `/<class_id>/camera-source` : output
-
-```json
-{
-	"message": "Camera source removed successfully!"
 }
 ```
 
@@ -459,7 +419,7 @@ use /attendance as url prefix
 
 use /recognition as url prefix
 
-For class-wise live recognition, send the selected class identifier with the request and make sure the class has a camera source configured under `/classes/<class_id>/camera-source`. The backend uses that mapping to open the correct livestream.
+For class-wise live recognition, send the selected class identifier with the request and make sure the class has a camera source configured on the class record. The backend uses that value to open the correct livestream.
 
 ### POST `/` : input
 

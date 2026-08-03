@@ -13,22 +13,10 @@ class Class(Base):
 
     class_id = Column(Integer, primary_key=True)
     class_name = Column(String(50), unique=True, nullable=False)
+    camera_source = Column(String(255))
 
     students = relationship("Student", back_populates="student_class", cascade="all, delete")
     timetable = relationship("Timetable", back_populates="student_class", cascade="all, delete")
-    camera_source = relationship("ClassCameraSource", back_populates="student_class", uselist=False, cascade="all, delete")
-
-
-# =====================================================
-# CLASS CAMERA SOURCES
-# =====================================================
-class ClassCameraSource(Base):
-    __tablename__ = "class_camera_sources"
-
-    class_id = Column(Integer, ForeignKey("classes.class_id"), primary_key=True)
-    camera_source = Column(String(255), nullable=False)
-
-    student_class = relationship("Class", back_populates="camera_source")
 
 
 # =====================================================
