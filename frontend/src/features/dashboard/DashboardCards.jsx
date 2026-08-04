@@ -4,7 +4,7 @@ function DashboardCards({ today }) {
   const present = today?.present || 0;
   const absent = today?.absent || 0;
   const total = present + absent;
-  const attendanceRate = `${Math.round((today?.attendance_rate || 0) * 100)}%`;
+  const attendanceRate = `${Math.round(today?.attendance_rate || 0)}%`;
 
   return (
     <section className="cards">

@@ -1,31 +1,11 @@
-// services/cameraServices.js
-import { BASE_URL, handleResponse } from "./api";
+import { BASE_URL } from "./api";
+
+const API_URL = BASE_URL
+  ? `${BASE_URL}/recognition`
+  : "http://127.0.0.1:5000/recognition";
 
 export const cameraService = {
-  // Fetch current recognition session logs & stats
-  getSessionData: async (camera, selectedClass) => {
-    const params = new URLSearchParams({ camera, class: selectedClass });
-    return fetch(`${BASE_URL}/attendance/live-session?${params.toString()}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    }).then(handleResponse);
-  },
-
-  // Toggle camera active state
-  toggleCamera: async (camera, activeState) => {
-    return fetch(`${BASE_URL}/camera/toggle`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ camera, active: activeState }),
-    }).then(handleResponse);
-  },
-
-  // Trigger snapshot save
-  captureSnapshot: async (camera) => {
-    return fetch(`${BASE_URL}/camera/snapshot`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ camera }),
-    }).then(handleResponse);
+  getStreamUrl(classId) {
+    return `${API_URL}/video_feed?class_id=${encodeURIComponent(classId)}`;
   },
 };

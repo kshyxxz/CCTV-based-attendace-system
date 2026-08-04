@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { FaFileExcel, FaFileCsv, FaFilePdf } from "react-icons/fa";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import AttendanceFilters from "./AttendanceFilters";
 import AttendanceTable from "./AttendanceTable";
 import { useAttendance } from "../../../hooks/useAttendance";
@@ -16,11 +19,27 @@ function Attendance() {
     filters,
     setFilters,
   } = useAttendance();
+  const [modalState, setModalState] = useState({
+    open: false,
+    title: "",
+    message: "",
+  });
+
+  const showNotice = (title, message) => {
+    setModalState({ open: true, title, message });
+  };
+
+  const closeNotice = () => {
+    setModalState((prev) => ({ ...prev, open: false }));
+  };
 
   // Export as CSV
   const exportToCSV = () => {
     if (allFilteredRecords.length === 0) {
-      alert("No records to export!");
+      showNotice(
+        "No records available",
+        "There are no attendance records to export with the current filters.",
+      );
       return;
     }
 
@@ -51,7 +70,10 @@ function Attendance() {
   // Export as Excel (HTML-Blob Table)
   const exportToExcel = () => {
     if (allFilteredRecords.length === 0) {
-      alert("No records to export!");
+      showNotice(
+        "No records available",
+        "There are no attendance records to export with the current filters.",
+      );
       return;
     }
 
@@ -76,64 +98,44 @@ function Attendance() {
     document.body.removeChild(link);
   };
 
-  // Export as Printable PDF
+  // Export as actual PDF download using jsPDF
   const exportToPDF = () => {
     if (allFilteredRecords.length === 0) {
-      alert("No records to export!");
+      showNotice(
+        "No records available",
+        "There are no attendance records to export with the current filters.",
+      );
       return;
     }
 
-    const printWindow = window.open("", "_blank");
-    let html = `
-      <html>
-        <head>
-          <title>Attendance Report</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            h2 { color: #1e293b; text-align: center; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #cbd5e1; padding: 10px; text-align: left; font-size: 14px; }
-            th { background-color: #f1f5f9; }
-          </style>
-        </head>
-        <body>
-          <h2>Attendance Records Report</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Roll No</th>
-                <th>Student Name</th>
-                <th>Subject</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-    `;
+    // 1. Create PDF document (portrait, millimeters, a4 paper size)
+    const doc = new jsPDF("p", "mm", "a4");
 
-    allFilteredRecords.forEach((r) => {
-      html += `
-        <tr>
-          <td>${r.rollno}</td>
-          <td>${r.student_name}</td>
-          <td>${r.subject_name}</td>
-          <td>${r.attendance_date}</td>
-        </tr>
-      `;
+    // 2. Add Title
+    doc.setFontSize(16);
+    doc.text("Attendance Records Report", 14, 15);
+
+    // 3. Define columns and data rows
+    const tableColumns = ["Roll No", "Student Name", "Subject", "Date"];
+    const tableRows = allFilteredRecords.map((r) => [
+      r.rollno,
+      r.student_name,
+      r.subject_name,
+      r.attendance_date,
+    ]);
+
+    // 4. Generate table inside the PDF
+    autoTable(doc, {
+      head: [tableColumns],
+      body: tableRows,
+      startY: 22,
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [241, 245, 249], textColor: [30, 41, 59] },
     });
 
-    html += `
-            </tbody>
-          </table>
-        </body>
-      </html>
-    `;
-
-    printWindow.document.write(html);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-    }, 500);
+    // 5. Trigger automatic download
+    const fileName = `Attendance_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+    doc.save(fileName);
   };
 
   return (
@@ -170,6 +172,36 @@ function Attendance() {
           totalPages={totalPages}
           setCurrentPage={setCurrentPage}
         />
+      )}
+
+      {modalState.open && (
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          onClick={closeNotice}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">{modalState.title}</h3>
+              <button
+                className="modal-close-btn"
+                onClick={closeNotice}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-message">{modalState.message}</p>
+              <div className="modal-actions">
+                <button className="btn-modal-primary" onClick={closeNotice}>
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -41,12 +41,32 @@ function Timetable() {
   } = useTimetable();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [formData, setFormData] = useState({
     subject_code: "",
     day_of_week: "Monday",
     start_time: "08:00:00",
     end_time: "08:45:00",
   });
+
+  const handleDelete = (period) => {
+    setDeleteTarget(period);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteTarget(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deletePeriod(deleteTarget.timetable_id);
+    } catch (err) {
+      alert(`Delete failed: ${err.message}`);
+    } finally {
+      setDeleteTarget(null);
+    }
+  };
 
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
@@ -55,16 +75,6 @@ function Timetable() {
     ? schedule.length === 0
     : Object.keys(schedule || {}).length === 0 ||
       Object.values(schedule || {}).every((arr) => !arr || arr.length === 0);
-
-  const handleDelete = async (timetableId) => {
-    if (window.confirm("Remove this period?")) {
-      try {
-        await deletePeriod(timetableId);
-      } catch (err) {
-        alert(`Delete failed: ${err.message}`);
-      }
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -116,6 +126,35 @@ function Timetable() {
         selectedClass={selectedClass}
         daysOfWeek={daysOfWeek}
       />
+
+      {deleteTarget && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <div className="modal-header">
+              <h2>Delete Period</h2>
+            </div>
+            <div className="modal-body">
+              <p>
+                Are you sure you want to delete the period for{" "}
+                <strong>
+                  {deleteTarget.subject_name ||
+                    deleteTarget.subject_code ||
+                    "this period"}
+                </strong>{" "}
+                on {deleteTarget.day_of_week}?
+              </p>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-close" onClick={handleCancelDelete}>
+                Cancel
+              </button>
+              <button className="btn-save" onClick={handleConfirmDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

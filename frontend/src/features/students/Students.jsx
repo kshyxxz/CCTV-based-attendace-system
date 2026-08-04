@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaPlus, FaSearch } from "react-icons/fa";
-import StudentTable from "./studentTable";
+import StudentTable from "./StudentTable";
 import StudentForm from "./StudentForm";
+import StudentDetailModal from "./StudentDetailModal";
 import { useStudents } from "../../../hooks/useStudents";
 import "./students.css";
 
@@ -19,6 +20,27 @@ function Students() {
     refreshStudents,
     handleDeleteStudent,
   } = useStudents();
+
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [selectedDetailRollno, setSelectedDetailRollno] = useState(null);
+
+  const handleDeleteRequest = (rollno) => {
+    setDeleteTarget(rollno);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteTarget(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    await handleDeleteStudent(deleteTarget);
+    setDeleteTarget(null);
+  };
+
+  const handleRowClick = (rollno) => {
+    setSelectedDetailRollno(rollno);
+  };
 
   const filteredStudents =
     students?.filter?.(
@@ -60,7 +82,8 @@ function Students() {
         <StudentTable
           filteredStudents={filteredStudents}
           onEdit={handleEditClick}
-          onDelete={handleDeleteStudent}
+          onDelete={handleDeleteRequest}
+          onRowClick={handleRowClick}
         />
       )}
 
@@ -70,6 +93,36 @@ function Students() {
           onClose={handleCloseModal}
           refreshStudents={refreshStudents}
         />
+      )}
+
+      {selectedDetailRollno && (
+        <StudentDetailModal
+          rollno={selectedDetailRollno}
+          onClose={() => setSelectedDetailRollno(null)}
+        />
+      )}
+
+      {deleteTarget && (
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Confirm Delete</h2>
+            </div>
+            <div className="modal-body">
+              <p>
+                Delete student <strong>{deleteTarget}</strong> ?
+              </p>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={handleCancelDelete}>
+                Cancel
+              </button>
+              <button className="btn-submit" onClick={handleConfirmDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

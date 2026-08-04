@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { FaGraduationCap, FaPlus, FaPencilAlt, FaTrash } from "react-icons/fa";
+import {
+  FaGraduationCap,
+  FaPlus,
+  FaPencilAlt,
+  FaTrash,
+  FaVideo,
+} from "react-icons/fa";
 import { useClasses } from "../../../hooks/useClasses";
 import { classService } from "../../../services/classesServices";
 import "./classes.css";
@@ -17,13 +23,31 @@ function Classes() {
     refreshClasses,
   } = useClasses();
 
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [classNameInput, setClassNameInput] = useState("");
+  const [cameraSourceInput, setCameraSourceInput] = useState("0");
+
+  const handleDeleteRequest = (className) => {
+    setDeleteTarget(className);
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteTarget(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    await handleDeleteClass(deleteTarget);
+    setDeleteTarget(null);
+  };
 
   useEffect(() => {
     if (editingClass) {
-      setClassNameInput(editingClass.class_name);
+      setClassNameInput(editingClass.class_name || "");
+      setCameraSourceInput(editingClass.camera_source || "0");
     } else {
       setClassNameInput("");
+      setCameraSourceInput("0");
     }
   }, [editingClass]);
 
@@ -33,9 +57,13 @@ function Classes() {
 
     try {
       if (editingClass) {
-        await classService.updateClass(editingClass.class_name, classNameInput);
+        await classService.updateClass(
+          editingClass.class_name,
+          classNameInput,
+          cameraSourceInput,
+        );
       } else {
-        await classService.createClass(classNameInput);
+        await classService.createClass(classNameInput, cameraSourceInput);
       }
       await refreshClasses();
       handleCloseModal();
@@ -77,7 +105,10 @@ function Classes() {
                     </div>
                     <div>
                       <h2 className="class-name">{cls.class_name}</h2>
-                      <p className="class-details">Active Classroom Section</p>
+                      <p className="class-details">
+                        <FaVideo style={{ marginRight: "4px" }} />
+                        Source: {cls.camera_source}
+                      </p>
                     </div>
                   </div>
 
@@ -91,7 +122,7 @@ function Classes() {
                     </button>
                     <button
                       className="btn-action"
-                      onClick={() => handleDeleteClass(cls.class_name)}
+                      onClick={() => handleDeleteRequest(cls.class_name)}
                       title="Delete"
                     >
                       <FaTrash />
@@ -108,7 +139,7 @@ function Classes() {
         <div className="modal-backdrop">
           <div className="modal-content">
             <div className="modal-header">
-              <h2>{editingClass ? "Edit Class Name" : "Create New Class"}</h2>
+              <h2>{editingClass ? "Edit Class" : "Create New Class"}</h2>
             </div>
             <form onSubmit={handleSubmit} className="modal-form">
               <div className="form-group">
@@ -119,6 +150,17 @@ function Classes() {
                   placeholder="e.g. A-100"
                   value={classNameInput}
                   onChange={(e) => setClassNameInput(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Camera Source</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 0 or rtsp://192.168.1.50:554/stream"
+                  value={cameraSourceInput}
+                  onChange={(e) => setCameraSourceInput(e.target.value)}
                 />
               </div>
 
@@ -135,6 +177,30 @@ function Classes() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="modal-backdrop">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Delete Class</h2>
+            </div>
+            <div className="modal-body">
+              <p>
+                Are you sure you want to delete class{" "}
+                <strong>{deleteTarget}</strong>?
+              </p>
+            </div>
+            <div className="modal-actions">
+              <button className="btn-cancel" onClick={handleCancelDelete}>
+                Cancel
+              </button>
+              <button className="btn-submit" onClick={handleConfirmDelete}>
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

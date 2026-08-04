@@ -7,7 +7,7 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
 
   const [classList, setClassList] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
-  const [selectedFile, setSelectedFile] = useState(null); // Raw file for POST request
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const [formData, setFormData] = useState({
     rollno: "",
@@ -30,7 +30,7 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
           setFormData((prev) => ({ ...prev, class_name: names[0] }));
         }
       } catch (err) {
-        console.error("Failed to load classes for dropdown:", err);
+        console.error("Failed to load classes:", err);
       } finally {
         setLoadingClasses(false);
       }
@@ -58,13 +58,9 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Catch the raw File object emitted by ImageUploader
   const handleImageSelect = (file) => {
     setSelectedFile(file);
   };
@@ -78,10 +74,8 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
 
     try {
       if (isEditMode) {
-        // Edit mode expects JSON payload
         await studentService.updateStudent(formData);
       } else {
-        // Creation mode expects multipart/form-data
         if (!selectedFile) {
           alert("Please upload a student photo.");
           return;
@@ -94,7 +88,7 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
         formDataPayload.append("class_name", formData.class_name);
         formDataPayload.append("phone", formData.phone);
         formDataPayload.append("address", formData.address);
-        formDataPayload.append("photo", selectedFile); // Attach the file under key 'photo'
+        formDataPayload.append("photo", selectedFile);
 
         await studentService.saveStudent(formDataPayload);
       }
@@ -114,7 +108,6 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
         </div>
 
         <form onSubmit={handleFormSubmit} className="modal-form">
-          {/* Hide photo upload during edit mode since backend PUT route doesn't process photo files */}
           {!isEditMode && <ImageUploader onImageSelect={handleImageSelect} />}
 
           <div className="form-group">
@@ -165,19 +158,11 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
                 onChange={handleInputChange}
                 required
                 disabled={loadingClasses || classList.length === 0}
-                style={{
-                  padding: "10px 14px",
-                  borderRadius: "8px",
-                  border: "1px solid #e2e8f0",
-                  backgroundColor: "#ffffff",
-                }}
               >
                 {loadingClasses ? (
                   <option value="">Loading classes...</option>
                 ) : classList.length === 0 ? (
-                  <option value="">
-                    No classes available (Create one first)
-                  </option>
+                  <option value="">No classes available</option>
                 ) : (
                   classList.map((cls) => (
                     <option key={cls} value={cls}>

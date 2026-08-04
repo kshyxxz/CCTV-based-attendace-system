@@ -29,8 +29,28 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
   return (
     <aside className={`sidebar-drawer ${isCollapsed ? "collapsed" : ""}`}>
       <div className="sidebar-header">
-        <div className="sidebar-logo">
-          <ShieldCheck size={24} />
+        <div
+          style={{
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "#ffffff",
+          }}
+        >
+          <img
+            src="../public/cctvlogo.png"
+            alt="Attendance System Logo"
+            style={{
+              height: "100%",
+              width: "100%",
+              objectFit: "cover",
+              transform: "scale(1.25)",
+            }}
+          />
         </div>
         {!isCollapsed && (
           <div className="sidebar-brand">
