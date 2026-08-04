@@ -35,10 +35,13 @@ export const classService = {
 
   // PUT /classes/<class_id>/camera-source -> Create or update camera source
   setCameraSource: async (classId, payload) => {
+    const body =
+      typeof payload === "string" ? { camera_source: payload } : { ...payload };
+
     return fetch(`${API_URL}/${encodeURIComponent(classId)}/camera-source`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(body),
     }).then(handleResponse);
   },
 
@@ -51,23 +54,32 @@ export const classService = {
   },
 
   // POST /classes/ -> Create class
-  createClass: async (className) => {
+  createClass: async (className, cameraSource = "0") => {
     return fetch(`${API_URL}/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ class_name: className }),
+      body: JSON.stringify({
+        class_name: className,
+        camera_source: cameraSource || "0",
+      }),
     }).then(handleResponse);
   },
 
-  // PUT /classes/ -> Update class name
-  updateClass: async (oldClassName, newClassName) => {
+  // PUT /classes/ -> Update class name and optionally its camera source
+  updateClass: async (oldClassName, newClassName, cameraSource) => {
+    const payload = {
+      class_name: oldClassName,
+      new_class_name: newClassName,
+    };
+
+    if (cameraSource !== undefined) {
+      payload.camera_source = cameraSource || "0";
+    }
+
     return fetch(`${API_URL}/`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        class_name: oldClassName,
-        new_class_name: newClassName,
-      }),
+      body: JSON.stringify(payload),
     }).then(handleResponse);
   },
 
