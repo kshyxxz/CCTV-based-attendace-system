@@ -14,7 +14,8 @@ export function useStudents() {
       setLoading(true);
       setError(null);
       const data = await studentService.getStudents();
-      setStudents(data || []);
+      const list = Array.isArray(data) ? data : data?.students || [];
+      setStudents(list);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -33,9 +34,6 @@ export function useStudents() {
   };
 
   const handleDeleteStudent = async (rollno) => {
-    if (!window.confirm(`Are you sure you want to delete student ${rollno}?`)) {
-      return;
-    }
     try {
       setError(null);
       await studentService.deleteStudent(rollno);

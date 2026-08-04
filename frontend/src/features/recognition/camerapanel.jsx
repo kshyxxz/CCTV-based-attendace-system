@@ -1,15 +1,19 @@
-// Made by Prashant
+// recognition/CameraPanel.jsx
 import { FaVideo, FaCamera, FaStop } from "react-icons/fa";
-
-const BACKEND = "http://localhost:5000";
 
 function CameraPanel({
   isCameraActive,
   handleStartCamera,
   handleCaptureSnapshot,
   stats,
-  // videoRef and detections are kept in the prop signature for compatibility
-  // but are no longer used — boxes are drawn server-side on the MJPEG stream
+  classesList = [],
+  classLoading,
+  selectedClassId,
+  setSelectedClassId,
+  cameraSource,
+  cameraSourceLoading,
+  cameraSourceError,
+  streamUrl,
   videoRef,
   detections = [],
 }) {
@@ -17,21 +21,62 @@ function CameraPanel({
     <div className="video-panel">
       <div className="controls-panel">
         <div className="controls-left">
+          {/* Stack select dropdown and source status vertically */}
+          <div className="select-and-source-group">
+            <div className="control-select-group">
+              <select
+                value={selectedClassId}
+                onChange={(e) => setSelectedClassId(e.target.value)}
+                disabled={isCameraActive || classLoading}
+              >
+                {classLoading ? (
+                  <option value="">Loading classes...</option>
+                ) : classesList.length === 0 ? (
+                  <option value="">No classes found</option>
+                ) : (
+                  classesList.map((cls) => (
+                    <option key={cls.class_id} value={cls.class_id}>
+                      {cls.class_name}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+
+            {/* Camera source now directly under the select element */}
+            <div className="source-status-wrapper">
+              {cameraSourceLoading ? (
+                <div className="camera-source-status">Loading...</div>
+              ) : cameraSource ? (
+                <div className="camera-source-status success">
+                  Source: {cameraSource}
+                </div>
+              ) : (
+                <div className="camera-source-status warning">
+                  No camera source
+                </div>
+              )}
+              {cameraSourceError && (
+                <div className="camera-source-status error">
+                  {cameraSourceError}
+                </div>
+              )}
+            </div>
+          </div>
+
           <button
             className={`btn-action-trigger ${isCameraActive ? "btn-stop" : "btn-start"}`}
             onClick={handleStartCamera}
+            disabled={
+              isCameraActive
+                ? false
+                : !selectedClassId ||
+                  Boolean(cameraSourceLoading) ||
+                  !cameraSource
+            }
           >
             {isCameraActive ? <FaStop /> : <FaVideo />}
             <span>{isCameraActive ? "Stop Camera" : "Start Camera"}</span>
-          </button>
-
-          <button
-            className="btn-action-trigger btn-snapshot"
-            disabled={!isCameraActive}
-            onClick={handleCaptureSnapshot}
-          >
-            <FaCamera />
-            <span>Capture Snapshot</span>
           </button>
         </div>
       </div>
@@ -40,11 +85,10 @@ function CameraPanel({
         className={`video-screen ${isCameraActive ? "active" : "offline"}`}
         style={{ position: "relative" }}
       >
-        {/* MJPEG stream from backend — bounding boxes are burned in server-side */}
-        {isCameraActive && (
+        {isCameraActive && streamUrl && (
           <img
             id="mjpeg-feed"
-            src={`${BACKEND}/recognition/video_feed`}
+            src={streamUrl}
             alt="Live camera feed"
             style={{
               width: "100%",

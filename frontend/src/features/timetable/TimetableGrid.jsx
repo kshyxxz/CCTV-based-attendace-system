@@ -114,7 +114,7 @@ export function TimetableGrid({
                       <button
                         className="btn-delete-small"
                         title="Delete period"
-                        onClick={() => onDelete(matchingPeriod.timetable_id)}
+                        onClick={() => onDelete(matchingPeriod)}
                       >
                         <FaTrash />
                       </button>

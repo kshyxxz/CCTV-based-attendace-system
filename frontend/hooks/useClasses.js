@@ -32,13 +32,11 @@ export function useClasses() {
   };
 
   const handleDeleteClass = async (className) => {
-    if (window.confirm(`Are you sure you want to delete class ${className}?`)) {
-      try {
-        await classService.deleteClass(className);
-        await fetchClasses();
-      } catch (err) {
-        alert(`Failed to delete class: ${err.message}`);
-      }
+    try {
+      await classService.deleteClass(className);
+      await fetchClasses();
+    } catch (err) {
+      alert(`Failed to delete class: ${err.message}`);
     }
   };
 

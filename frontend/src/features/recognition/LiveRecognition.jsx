@@ -7,20 +7,27 @@ function LiveRecognition() {
   const {
     isCameraActive,
     searchQuery = "",
+    setSearchQuery,
+    classesList,
+    selectedClassId,
+    setSelectedClassId,
+    cameraSource,
+    cameraSourceLoading,
+    cameraSourceError,
     recognitionLogs = [],
     stats,
     detections,
     handleStartCamera,
     handleCaptureSnapshot,
+    streamUrl,
     videoRef,
-    clearRecognitionLogs, // NEW
+    clearRecognitionLogs,
   } = useCamera();
 
-  // Keep filteredLogs for search in the side panel
   const filteredLogs = recognitionLogs.filter(
     (log) =>
-      log.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      log.roll.toLowerCase().includes(searchQuery.toLowerCase()),
+      (log.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (log.roll || "").toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -40,13 +47,21 @@ function LiveRecognition() {
           handleStartCamera={handleStartCamera}
           handleCaptureSnapshot={handleCaptureSnapshot}
           stats={stats}
+          classesList={classesList}
+          classLoading={cameraSourceLoading && !classesList.length}
+          selectedClassId={selectedClassId}
+          setSelectedClassId={setSelectedClassId}
+          cameraSource={cameraSource}
+          cameraSourceLoading={cameraSourceLoading}
+          cameraSourceError={cameraSourceError}
+          streamUrl={streamUrl}
           videoRef={videoRef}
           detections={detections}
         />
 
         <LiveFeedCard
-          recognitionLogs={recognitionLogs} // full logs
-          filteredLogs={filteredLogs} // filtered by search
+          recognitionLogs={recognitionLogs}
+          filteredLogs={filteredLogs}
           clearRecognitionLogs={clearRecognitionLogs}
         />
       </div>

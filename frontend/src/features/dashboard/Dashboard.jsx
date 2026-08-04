@@ -40,30 +40,32 @@ function Dashboard() {
 
         <div className="table-box">
           <h2>Subject Distribution</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Subject</th>
-                <th className="text-right">Student Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subjectDistribution.length === 0 ? (
+          <div className="table-scroll-area">
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="2" className="empty-table-text">
-                    No subject data available.
-                  </td>
+                  <th>Subject</th>
+                  <th className="text-right">Student Count</th>
                 </tr>
-              ) : (
-                subjectDistribution.map((item, index) => (
-                  <tr key={index}>
-                    <td className="subject-name">{item.subject}</td>
-                    <td className="text-right font-semibold">{item.count}</td>
+              </thead>
+              <tbody>
+                {subjectDistribution.length === 0 ? (
+                  <tr>
+                    <td colSpan="2" className="empty-table-text">
+                      No subject data available.
+                    </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  subjectDistribution.map((item, index) => (
+                    <tr key={index}>
+                      <td className="subject-name">{item.subject}</td>
+                      <td className="text-right font-semibold">{item.count}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
     </div>

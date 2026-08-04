@@ -1,7 +1,12 @@
 import React from "react";
 import { FaTrash, FaPencilAlt } from "react-icons/fa";
 
-export default function StudentTable({ filteredStudents, onEdit, onDelete }) {
+export default function StudentTable({
+  filteredStudents,
+  onEdit,
+  onDelete,
+  onRowClick,
+}) {
   return (
     <div className="table-responsive">
       <table className="student-table">
@@ -25,7 +30,12 @@ export default function StudentTable({ filteredStudents, onEdit, onDelete }) {
             </tr>
           ) : (
             filteredStudents.map((student) => (
-              <tr key={student.rollno}>
+              <tr
+                key={student.rollno}
+                onClick={() => onRowClick(student.rollno)}
+                style={{ cursor: "pointer" }}
+                className="clickable-row"
+              >
                 <td className="student-name">{student.rollno}</td>
                 <td>{student.name}</td>
                 <td>
@@ -56,14 +66,20 @@ export default function StudentTable({ filteredStudents, onEdit, onDelete }) {
                   >
                     <button
                       className="btn-edit"
-                      onClick={() => onEdit(student)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(student);
+                      }}
                       title="Edit Student"
                     >
                       <FaPencilAlt />
                     </button>
                     <button
                       className="btn-delete"
-                      onClick={() => onDelete(student.rollno)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(student.rollno);
+                      }}
                       title="Delete Student"
                     >
                       <FaTrash />

@@ -5,6 +5,7 @@ const API_URL = BASE_URL
   : "http://127.0.0.1:5000/students";
 
 export const studentService = {
+  // GET /students/ - Get all students
   getStudents: async () => {
     return fetch(`${API_URL}/`, {
       method: "GET",
@@ -12,6 +13,7 @@ export const studentService = {
     }).then(handleResponse);
   },
 
+  // GET /classes/ - Get available classes for dropdown
   getClasses: async () => {
     const classesUrl = BASE_URL
       ? `${BASE_URL}/classes`
@@ -22,6 +24,7 @@ export const studentService = {
     }).then(handleResponse);
   },
 
+  // GET /students/<rollno> - Get student details & attendance stats
   getStudentByRollNo: async (rollno) => {
     return fetch(`${API_URL}/${rollno}`, {
       method: "GET",
@@ -29,17 +32,15 @@ export const studentService = {
     }).then(handleResponse);
   },
 
-  // UPDATED: Sends FormData for multipart/form-data compatibility
+  // POST /students/create - Create student with multipart photo upload
   saveStudent: async (formDataObj) => {
     return fetch(`${API_URL}/create`, {
       method: "POST",
-      // Note: Do NOT set 'Content-Type': 'multipart/form-data' header manually.
-      // fetch() automatically generates the correct boundary string when given a FormData body.
-      body: formDataObj,
+      body: formDataObj, // Note: Browser sets multipart header and boundary automatically
     }).then(handleResponse);
   },
 
-  // PUT still expects JSON according to your Flask code
+  // PUT /students/ - Update student details via JSON
   updateStudent: async (payload) => {
     return fetch(`${API_URL}/`, {
       method: "PUT",
@@ -48,6 +49,7 @@ export const studentService = {
     }).then(handleResponse);
   },
 
+  // DELETE /students/ - Delete student record
   deleteStudent: async (rollno) => {
     return fetch(`${API_URL}/`, {
       method: "DELETE",

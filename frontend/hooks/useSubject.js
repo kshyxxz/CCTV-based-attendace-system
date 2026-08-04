@@ -32,13 +32,11 @@ export function useSubjects() {
   };
 
   const handleDeleteSubject = async (subject_id) => {
-    if (window.confirm(`Are you sure you want to delete this subject?`)) {
-      try {
-        await subjectService.deleteSubject(subject_id);
-        await fetchSubjects();
-      } catch (err) {
-        alert(`Failed to delete subject: ${err.message}`);
-      }
+    try {
+      await subjectService.deleteSubject(subject_id);
+      await fetchSubjects();
+    } catch (err) {
+      alert(`Failed to delete subject: ${err.message}`);
     }
   };
 
