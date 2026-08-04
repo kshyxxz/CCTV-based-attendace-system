@@ -161,6 +161,15 @@ use /classes as url prefix
 }
 ```
 
+### PUT `/<class_id>/camera-source` : input
+
+```json
+{
+	"class_id": 1,
+	"camera_source": "rtsp://admin:admin123@1xx.1xx.1.1x:1xx/1xx"
+}
+```
+
 ## Subject APIs:
 
 use /subjects as url prefix
