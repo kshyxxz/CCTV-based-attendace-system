@@ -1,8 +1,8 @@
 // AttendanceFilters.jsx
 import { useState, useEffect } from "react";
-import { subjectService } from "../../../services/subjectServices"; // Adjust path as needed
+import { subjectService } from "../../../services/subjectServices";
 
-function AttendanceFilters({ filters, setFilters }) {
+function AttendanceFilters({ filters, setFilters, rollGroups }) {
   const [subjectsList, setSubjectsList] = useState([]);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
 
@@ -42,6 +42,24 @@ function AttendanceFilters({ filters, setFilters }) {
         />
       </div>
 
+      {/* Roll-number group dropdown: NCE080BCT018 -> 080BCT */}
+      <div className="filter-input-wrapper">
+        <select
+          name="rollGroup"
+          className="filter-dropdown"
+          value={filters.rollGroup}
+          onChange={handleSelectChange}
+          aria-label="Filter attendance by roll-number group"
+        >
+          <option value="All">All Roll Groups</option>
+          {rollGroups.map((rollGroup) => (
+            <option key={rollGroup} value={rollGroup}>
+              {rollGroup}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Subject Filter Dropdown */}
       <div className="filter-input-wrapper">
         <select
@@ -62,11 +80,13 @@ function AttendanceFilters({ filters, setFilters }) {
         </select>
       </div>
 
-      {filters.date || filters.subject !== "All" ? (
+      {filters.date || filters.subject !== "All" || filters.rollGroup !== "All" ? (
         <button
           type="button"
           className="btn-clear-filter"
-          onClick={() => setFilters({ date: "", subject: "All" })}
+          onClick={() =>
+            setFilters({ date: "", subject: "All", rollGroup: "All" })
+          }
         >
           Reset Filters
         </button>

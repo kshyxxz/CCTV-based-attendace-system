@@ -396,7 +396,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
-  margin-left: 230px;
+  margin-left: auto;
 }
 
 .btn-clear-filter:hover {

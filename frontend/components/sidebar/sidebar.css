@@ -147,6 +147,14 @@
   background-color: #f8fafc;
   color: #0f172a;
 }
+
+.sidebar-toggle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  color: inherit;
+}
 /* Push the logout link to the bottom of the navigation area if using flexbox */
 .sidebar-nav {
   display: flex;

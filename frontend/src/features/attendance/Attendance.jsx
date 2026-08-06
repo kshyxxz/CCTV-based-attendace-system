@@ -16,6 +16,7 @@ function Attendance() {
     currentPage,
     setCurrentPage,
     totalPages,
+    rollGroups,
     filters,
     setFilters,
   } = useAttendance();
@@ -160,7 +161,11 @@ function Attendance() {
         </div>
       </div>
 
-      <AttendanceFilters filters={filters} setFilters={setFilters} />
+      <AttendanceFilters
+        filters={filters}
+        setFilters={setFilters}
+        rollGroups={rollGroups}
+      />
 
       {loading ? (
         <div className="attendance-loading">Loading attendance records...</div>

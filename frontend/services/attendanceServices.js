@@ -9,7 +9,6 @@ export const attendanceService = {
     if (filters.subject && filters.subject !== "All") {
       params.append("subject", filters.subject);
     }
-
     const queryString = params.toString();
     const url = `${BASE_URL}/attendance/${queryString ? `?${queryString}` : ""}`;
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import StudentTable from "./StudentTable";
 import StudentForm from "./StudentForm";
@@ -7,6 +8,12 @@ import { useStudents } from "../../../hooks/useStudents";
 import "./students.css";
 
 function Students() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams();
+  const isCreateRoute = location.pathname === "/students/create";
+  const selectedRollno = params.rollno;
+
   const {
     students,
     loading,
@@ -22,7 +29,14 @@ function Students() {
   } = useStudents();
 
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [selectedDetailRollno, setSelectedDetailRollno] = useState(null);
+
+  const handleAddStudent = () => {
+    navigate("/students/create");
+  };
+
+  const handleCloseCreateForm = () => {
+    navigate("/students");
+  };
 
   const handleDeleteRequest = (rollno) => {
     setDeleteTarget(rollno);
@@ -39,7 +53,7 @@ function Students() {
   };
 
   const handleRowClick = (rollno) => {
-    setSelectedDetailRollno(rollno);
+    navigate(`/students/${encodeURIComponent(rollno)}`);
   };
 
   const filteredStudents =
@@ -58,7 +72,7 @@ function Students() {
           <h1>Student Registry</h1>
           <p className="subtitle">{students.length} students enrolled</p>
         </div>
-        <button className="btn-add" onClick={() => handleEditClick(null)}>
+        <button className="btn-add" onClick={handleAddStudent}>
           <FaPlus /> Add Student
         </button>
       </div>
@@ -87,7 +101,15 @@ function Students() {
         />
       )}
 
-      {isModalOpen && (
+      {isCreateRoute && (
+        <StudentForm
+          studentData={null}
+          onClose={handleCloseCreateForm}
+          refreshStudents={refreshStudents}
+        />
+      )}
+
+      {isModalOpen && !isCreateRoute && (
         <StudentForm
           studentData={editingStudent}
           onClose={handleCloseModal}
@@ -95,10 +117,10 @@ function Students() {
         />
       )}
 
-      {selectedDetailRollno && (
+      {selectedRollno && (
         <StudentDetailModal
-          rollno={selectedDetailRollno}
-          onClose={() => setSelectedDetailRollno(null)}
+          rollno={selectedRollno}
+          onClose={() => navigate("/students")}
         />
       )}
 
