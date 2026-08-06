@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from database.crud import get_attendances, get_subject, get_student
+from database.crud import get_attendances, get_subject, get_student, get_class_name
 from database.database import SessionLocal
 
 attendance_bp = Blueprint("attendance", __name__)
@@ -16,7 +16,8 @@ def get_attendance():
 			"rollno": attendance.rollno,
 			"status": attendance.status,
 			"subject_name": get_subject(db, attendance.subject_id).subject_name,
-			"student_name": f"{get_student(db, attendance.rollno).fname} {get_student(db, attendance.rollno).lname}"
+			"student_name": f"{get_student(db, attendance.rollno).fname} {get_student(db, attendance.rollno).lname}",
+			"class_name": get_class_name(db, get_student(db, attendance.rollno).class_id)
 		} for attendance in attendances])
 	
 	except Exception as e:

@@ -405,21 +405,24 @@ use /attendance as url prefix
 		"rollno": "NCE080BCT020",
 		"status": "Present",
 		"student_name": "Kshitiz Shrestha",
-		"subject_name": "Artificial Intelligence"
+		"subject_name": "Artificial Intelligence",
+		"class_name": "A-101"
 	},
 	{
 		"attendance_date": "2026-07-28",
 		"rollno": "NCE080BCT020",
 		"status": "Present",
 		"student_name": "Kshitiz Shrestha",
-		"subject_name": "Data Com"
+		"subject_name": "Data Com",
+		"class_name": "A-101"
 	},
 	{
 		"attendance_date": "2026-07-28",
 		"rollno": "NCE080BCT022",
 		"status": "Present",
 		"student_name": "Loblesh Bhartal",
-		"subject_name": "Data Com"
+		"subject_name": "Data Com",
+		"class_name": "A-101"
 	}
 ]
 ```
