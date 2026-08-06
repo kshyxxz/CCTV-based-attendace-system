@@ -32,7 +32,7 @@ def ret_classes():
 	except Exception as e:
 		return jsonify({"error": f"{e}"})
 
-@class_bp.route("/", methods=["POST"])
+@class_bp.route("/create", methods=["POST"])
 def add_class():
 	db = SessionLocal()
 
@@ -48,8 +48,8 @@ def add_class():
 	finally:
 		db.close()
 	
-@class_bp.route("/", methods=["PUT"])
-def change_class():
+@class_bp.route("/<class_name>/update", methods=["PUT"])
+def change_class(class_name):
 	db = SessionLocal()
 
 	try:
@@ -64,8 +64,8 @@ def change_class():
 	finally:
 		db.close()
 	
-@class_bp.route("/", methods=["DELETE"])
-def remove_class():
+@class_bp.route("/<class_name>/delete", methods=["DELETE"])
+def remove_class(class_name):
 	db = SessionLocal()
 
 	try:
