@@ -23,7 +23,7 @@ def ret_subjects():
 	except Exception as e:
 		return jsonify({"error": f"{e}"})
 	
-@subject_bp.route("/", methods=["POST"])
+@subject_bp.route("/create", methods=["POST"])
 def add_subject():
 	db = SessionLocal()
 
@@ -41,7 +41,7 @@ def add_subject():
 	except Exception as e:
 		return jsonify({"error": f"{e}"})
 
-@subject_bp.route("/", methods=["PUT"])
+@subject_bp.route("/<subject_code>/update", methods=["PUT"])
 def change_subject():
 	db = SessionLocal()
 
@@ -60,7 +60,7 @@ def change_subject():
 	except Exception as e:
 		return jsonify({"error": f"{e}"})
 
-@subject_bp.route("/", methods=["DELETE"])
+@subject_bp.route("/<subject_code>/delete", methods=["DELETE"])
 def delete_subjects():
 	db = SessionLocal()
 

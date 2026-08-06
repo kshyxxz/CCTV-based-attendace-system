@@ -104,12 +104,12 @@ form input
 
 use /classes as url prefix
 
-| Method | Endpoint |   Description   |
-| :----: | :------: | :-------------: |
-|  GET   |   `/`    | Get all classes |
-|  POST  |   `/`    |  Create class   |
-|  PUT   |   `/`    |  Update class   |
-| DELETE |   `/`    |  Delete class   |
+| Method |        Endpoint        |   Description   |
+| :----: | :--------------------: | :-------------: |
+|  GET   |          `/`           | Get all classes |
+|  POST  |       `/create`        |  Create class   |
+|  PUT   | `/<class_name>/update` |  Update class   |
+| DELETE | `/<class_name>/delete` |  Delete class   |
 
 ### GET `/` : output
 
@@ -174,12 +174,12 @@ use /classes as url prefix
 
 use /subjects as url prefix
 
-| Method | Endpoint |   Description    |
-| :----: | :------: | :--------------: |
-|  GET   |   `/`    | Get all subjects |
-|  POST  |   `/`    |  Create subject  |
-|  PUT   |   `/`    |  Update subject  |
-| DELETE |   `/`    |  Delete subject  |
+| Method |         Endpoint         |   Description    |
+| :----: | :----------------------: | :--------------: |
+|  GET   |           `/`            | Get all subjects |
+|  POST  |        `/create`         |  Create subject  |
+|  PUT   | `/<subject_code>/update` |  Update subject  |
+| DELETE | `/<subject_code>/delete` |  Delete subject  |
 
 ### GET `/` : output
 
@@ -289,8 +289,8 @@ use /timetable as url prefix
 | :----: | :--------------------: | :----------------------------: |
 |  GET   |    `/<class_name>/`    |  Get timetable for that class  |
 |  POST  | `/<class_name>/create` | Create a period for that class |
-|  PUT   |    `/<class_name>/`    | Update a period for that class |
-| DELETE |    `/<class_name>/`    | Delete a period for that class |
+|  PUT   | `/<class_name>/update` | Update a period for that class |
+| DELETE | `/<class_name>/delete` | Delete a period for that class |
 
 ### GET `/<class_name> : output
 
