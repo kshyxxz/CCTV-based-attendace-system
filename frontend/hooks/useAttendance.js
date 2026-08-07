@@ -12,6 +12,8 @@ export function useAttendance() {
   const [filters, setFilters] = useState({
     date: "",
     subject: "All",
+    classId: "All",
+    className: "",
     rollGroup: "All",
   });
 
@@ -39,7 +41,7 @@ export function useAttendance() {
   useEffect(() => {
     fetchRecords();
     setCurrentPage(1);
-  }, [filters.date, filters.subject]);
+  }, [filters.date, filters.subject, filters.classId]);
 
   const rollGroups = useMemo(
     () =>
@@ -58,6 +60,13 @@ export function useAttendance() {
       if (
         filters.subject !== "All" &&
         record.subject_name?.toLowerCase() !== filters.subject.toLowerCase()
+      ) {
+        return false;
+      }
+      if (
+        filters.classId !== "All" &&
+        String(record.class_id ?? "") !== String(filters.classId) &&
+        record.class_name !== filters.className
       ) {
         return false;
       }

@@ -1,10 +1,13 @@
 // AttendanceFilters.jsx
 import { useState, useEffect } from "react";
 import { subjectService } from "../../../services/subjectServices";
+import { classService } from "../../../services/classesServices";
 
 function AttendanceFilters({ filters, setFilters, rollGroups }) {
   const [subjectsList, setSubjectsList] = useState([]);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
+  const [classesList, setClassesList] = useState([]);
+  const [loadingClasses, setLoadingClasses] = useState(true);
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -24,8 +27,39 @@ function AttendanceFilters({ filters, setFilters, rollGroups }) {
     fetchSubjects();
   }, []);
 
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        setLoadingClasses(true);
+        const data = await classService.getClasses();
+        setClassesList(Array.isArray(data) ? data : data?.classes || []);
+      } catch (err) {
+        console.error("Failed to fetch classes:", err);
+        setClassesList([]);
+      } finally {
+        setLoadingClasses(false);
+      }
+    };
+
+    fetchClasses();
+  }, []);
+
   const handleSelectChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "classId") {
+      const selectedClass = classesList.find(
+        (classItem) => String(classItem.class_id ?? classItem.id) === value,
+      );
+      setFilters((prev) => ({
+        ...prev,
+        classId: value,
+        className:
+          selectedClass?.class_name ?? selectedClass?.name ?? "",
+      }));
+      return;
+    }
+
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -40,6 +74,31 @@ function AttendanceFilters({ filters, setFilters, rollGroups }) {
           value={filters.date}
           onChange={handleSelectChange}
         />
+      </div>
+
+      <div className="filter-input-wrapper">
+        <select
+          name="classId"
+          className="filter-dropdown"
+          value={filters.classId}
+          onChange={handleSelectChange}
+          disabled={loadingClasses}
+          aria-label="Filter attendance by class"
+        >
+          <option value="All">
+            {loadingClasses ? "Loading Classes..." : "All Classes"}
+          </option>
+          {classesList.map((classItem) => {
+            const classId = classItem.class_id ?? classItem.id;
+            const className = classItem.class_name ?? classItem.name ?? classId;
+
+            return (
+              <option key={classId} value={classId}>
+                {className}
+              </option>
+            );
+          })}
+        </select>
       </div>
 
       {/* Roll-number group dropdown: NCE080BCT018 -> 080BCT */}
@@ -80,12 +139,21 @@ function AttendanceFilters({ filters, setFilters, rollGroups }) {
         </select>
       </div>
 
-      {filters.date || filters.subject !== "All" || filters.rollGroup !== "All" ? (
+      {filters.date ||
+      filters.subject !== "All" ||
+      filters.classId !== "All" ||
+      filters.rollGroup !== "All" ? (
         <button
           type="button"
           className="btn-clear-filter"
           onClick={() =>
-            setFilters({ date: "", subject: "All", rollGroup: "All" })
+            setFilters({
+              date: "",
+              subject: "All",
+              classId: "All",
+              className: "",
+              rollGroup: "All",
+            })
           }
         >
           Reset Filters
