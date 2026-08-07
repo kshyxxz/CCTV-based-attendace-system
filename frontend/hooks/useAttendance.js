@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { attendanceService } from "../services/attendanceServices";
 
+const getRollGroup = (rollno) => String(rollno || "").trim().slice(3, -3);
+
 export function useAttendance() {
   const [rawRecords, setRawRecords] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -10,13 +12,24 @@ export function useAttendance() {
   const [filters, setFilters] = useState({
     date: "",
     subject: "All",
+    classId: "All",
+    className: "",
+    rollGroup: "All",
   });
 
   const fetchRecords = async () => {
     setLoading(true);
     try {
       const data = await attendanceService.getRecords(filters);
-      setRawRecords(Array.isArray(data) ? data : data.records || []);
+      const records = Array.isArray(data) ? data : data.records || [];
+      // The attendance API provides rollno, e.g. NCE080BCT018.
+      // Store its middle portion (080BCT) for display and filtering.
+      setRawRecords(
+        records.map((record) => ({
+          ...record,
+          rollGroup: getRollGroup(record.rollno),
+        })),
+      );
     } catch (error) {
       console.error("API error fetching attendance records:", error);
       setRawRecords([]);
@@ -28,19 +41,38 @@ export function useAttendance() {
   useEffect(() => {
     fetchRecords();
     setCurrentPage(1);
-  }, [filters.date, filters.subject]);
+  }, [filters.date, filters.subject, filters.classId]);
 
-  // Client-side filtering by date and subject
+  const rollGroups = useMemo(
+    () =>
+      [...new Set(rawRecords.map((record) => record.rollGroup).filter(Boolean))].sort(),
+    [rawRecords],
+  );
+
+  // Client-side filtering by date, subject, and roll-number group.
   const filteredRecords = useMemo(() => {
     return rawRecords.filter((record) => {
       // Filter by Date
       if (filters.date && record.attendance_date !== filters.date) {
         return false;
       }
-      // Filter by Subject/Class
+      // Filter by Subject
       if (
         filters.subject !== "All" &&
         record.subject_name?.toLowerCase() !== filters.subject.toLowerCase()
+      ) {
+        return false;
+      }
+      if (
+        filters.classId !== "All" &&
+        String(record.class_id ?? "") !== String(filters.classId) &&
+        record.class_name !== filters.className
+      ) {
+        return false;
+      }
+      if (
+        filters.rollGroup !== "All" &&
+        record.rollGroup !== filters.rollGroup
       ) {
         return false;
       }
@@ -65,6 +97,7 @@ export function useAttendance() {
     currentPage,
     setCurrentPage,
     totalPages,
+    rollGroups,
     filters,
     setFilters,
   };

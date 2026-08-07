@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaPlus, FaPencilAlt, FaTrash } from "react-icons/fa";
 import { useSubjects } from "../../../hooks/useSubject";
 import { subjectService } from "../../../services/subjectServices";
@@ -7,6 +8,10 @@ import "./subjects.css";
 const SUBJECT_CODE_REGEX = /^[A-Z]{2,4}\s?\d{3}$/;
 
 function Subjects() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isCreateRoute = location.pathname === "/subjects/create";
+
   const {
     subjects,
     loading,
@@ -22,6 +27,7 @@ function Subjects() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState("");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [formData, setFormData] = useState({
     subject_code: "",
     subject_name: "",
@@ -43,6 +49,18 @@ function Subjects() {
     setValidationError(""); // Reset error message on modal open/switch
   }, [editingSubject, isModalOpen]);
 
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -50,6 +68,7 @@ function Subjects() {
     const updatedValue = name === "subject_code" ? value.toUpperCase() : value;
 
     setFormData((prev) => ({ ...prev, [name]: updatedValue }));
+    setHasUnsavedChanges(true);
 
     // Clear error message when user starts fixing the subject code
     if (name === "subject_code" && validationError) {
@@ -87,8 +106,12 @@ function Subjects() {
           subject_name: trimmedName,
         });
       }
+      setHasUnsavedChanges(false);
       await refreshSubjects();
       handleCloseModal();
+      if (isCreateRoute) {
+        navigate("/subjects");
+      }
     } catch (err) {
       setValidationError(
         `Error saving subject: ${err.message || "An error occurred"}`,
@@ -96,6 +119,14 @@ function Subjects() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleAddSubject = () => {
+    navigate("/subjects/create");
+  };
+
+  const handleCloseCreateForm = () => {
+    navigate("/subjects");
   };
 
   const handleDeleteRequest = (subject) => {
@@ -126,7 +157,7 @@ function Subjects() {
           <h1 className="page-title">Subjects</h1>
           <p className="page-subtitle">Subject registry and details</p>
         </div>
-        <button className="btn-primary" onClick={() => handleOpenModal(null)}>
+        <button className="btn-primary" onClick={handleAddSubject}>
           <FaPlus /> New Subject
         </button>
       </div>
@@ -195,7 +226,7 @@ function Subjects() {
       )}
 
       {/* Create / Edit Modal */}
-      {isModalOpen && (
+      {(isCreateRoute || isModalOpen) && (
         <div className="modal-backdrop">
           <div className="modal-content">
             <div className="modal-header">
@@ -248,7 +279,19 @@ function Subjects() {
                 <button
                   type="button"
                   className="btn-cancel"
-                  onClick={handleCloseModal}
+                  onClick={() => {
+                    if (hasUnsavedChanges) {
+                      const proceed = window.confirm(
+                        "You have unsaved changes. Do you want to leave this form?",
+                      );
+                      if (!proceed) return;
+                    }
+                    setHasUnsavedChanges(false);
+                    handleCloseModal();
+                    if (isCreateRoute) {
+                      handleCloseCreateForm();
+                    }
+                  }}
                   disabled={isSubmitting}
                 >
                   Cancel

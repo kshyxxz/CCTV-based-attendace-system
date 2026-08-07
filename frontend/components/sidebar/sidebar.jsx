@@ -108,7 +108,9 @@ export default function Sidebar({ isCollapsed, setIsCollapsed }) {
         className="sidebar-toggle"
         aria-label="Toggle Sidebar"
       >
-        {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+        <span className="sidebar-toggle-icon" aria-hidden="true">
+          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </span>
       </button>
     </aside>
   );

@@ -33,7 +33,6 @@ function LiveFeedCard({
   };
 
   const handleClear = () => {
-    // Confirm before clearing to avoid accidental deletion
     const ok = window.confirm(
       "Clear all recognition records from the live feed?",
     );

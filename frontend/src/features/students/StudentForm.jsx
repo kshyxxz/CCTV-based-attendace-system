@@ -8,6 +8,7 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
   const [classList, setClassList] = useState([]);
   const [loadingClasses, setLoadingClasses] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const [formData, setFormData] = useState({
     rollno: "",
@@ -53,16 +54,42 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
         phone: studentData.phone || "",
         address: studentData.address || "",
       });
+      setHasUnsavedChanges(false);
     }
   }, [studentData]);
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setHasUnsavedChanges(true);
   };
 
   const handleImageSelect = (file) => {
     setSelectedFile(file);
+    setHasUnsavedChanges(true);
+  };
+
+  const handleCancel = () => {
+    if (hasUnsavedChanges) {
+      const proceed = window.confirm(
+        "You have unsaved changes. Do you want to leave this form?",
+      );
+      if (!proceed) return;
+    }
+    setHasUnsavedChanges(false);
+    onClose();
   };
 
   const handleFormSubmit = async (e) => {
@@ -93,6 +120,7 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
         await studentService.saveStudent(formDataPayload);
       }
 
+      setHasUnsavedChanges(false);
       await refreshStudents();
       onClose();
     } catch (err) {
@@ -199,7 +227,7 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
           </div>
 
           <div className="modal-actions">
-            <button type="button" className="btn-cancel" onClick={onClose}>
+            <button type="button" className="btn-cancel" onClick={handleCancel}>
               Cancel
             </button>
             <button

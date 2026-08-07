@@ -1,5 +1,5 @@
 import React from "react";
-import { FaTrash, FaCalendarTimes } from "react-icons/fa";
+import { FaTrash, FaPencilAlt, FaCalendarTimes } from "react-icons/fa";
 
 // Converts any time string ("11:00", "11:00:00", "11:00 AM") to total minutes
 const parseTimeToMinutes = (timeStr) => {
@@ -27,6 +27,7 @@ export function TimetableGrid({
   schedule = {},
   isScheduleEmpty,
   onDelete,
+  onEdit,
 }) {
   if (isScheduleEmpty || !timeSlots || timeSlots.length === 0) {
     return (
@@ -111,6 +112,13 @@ export function TimetableGrid({
                           matchingPeriod.subject_code ||
                           matchingPeriod.subject}
                       </span>
+                      <button
+                        className="btn-delete-small"
+                        title="Edit period"
+                        onClick={() => onEdit(matchingPeriod)}
+                      >
+                        <FaPencilAlt />
+                      </button>
                       <button
                         className="btn-delete-small"
                         title="Delete period"

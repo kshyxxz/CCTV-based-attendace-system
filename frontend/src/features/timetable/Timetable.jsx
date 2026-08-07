@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTimetable } from "../../../hooks/useTimetable";
 import { TimetableHeader } from "./TimetableHeader";
 import { TimetableGrid } from "./TimetableGrid";
@@ -29,6 +30,9 @@ const DEFAULT_TIME_SLOTS = [
 ];
 
 function Timetable() {
+  const navigate = useNavigate();
+  const params = useParams();
+
   const {
     classesList = [],
     selectedClass,
@@ -37,11 +41,14 @@ function Timetable() {
     loading,
     error,
     addPeriod,
+    updatePeriod,
     deletePeriod,
   } = useTimetable();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [editingPeriod, setEditingPeriod] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [formData, setFormData] = useState({
     subject_code: "",
     day_of_week: "Monday",
@@ -49,8 +56,80 @@ function Timetable() {
     end_time: "08:45:00",
   });
 
+  useEffect(() => {
+    if (params.className) {
+      const decodedClassName = decodeURIComponent(params.className);
+      if (decodedClassName !== selectedClass) {
+        setSelectedClass(decodedClassName);
+      }
+    }
+  }, [params.className, selectedClass, setSelectedClass]);
+
+  const handleOpenAddModal = () => {
+    setEditingPeriod(null);
+    setHasUnsavedChanges(false);
+    setFormData({
+      subject_code: "",
+      day_of_week: "Monday",
+      start_time: "08:00:00",
+      end_time: "08:45:00",
+    });
+    setIsModalOpen(true);
+  };
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingPeriod(null);
+    setHasUnsavedChanges(false);
+    setFormData({
+      subject_code: "",
+      day_of_week: "Monday",
+      start_time: "08:00:00",
+      end_time: "08:45:00",
+    });
+    if (selectedClass) {
+      navigate(`/timetable/${encodeURIComponent(selectedClass)}`);
+    } else {
+      navigate("/timetable");
+    }
+  };
+
+  const handleEdit = (period) => {
+    setEditingPeriod(period);
+    setHasUnsavedChanges(false);
+    setFormData({
+      subject_code: period.subject_code || "",
+      day_of_week: period.day_of_week || "Monday",
+      start_time: period.start_time || "08:00:00",
+      end_time: period.end_time || "08:45:00",
+    });
+    setIsModalOpen(true);
+    if (selectedClass) {
+      navigate(`/timetable/${encodeURIComponent(selectedClass)}`);
+    } else {
+      navigate("/timetable");
+    }
+  };
+
   const handleDelete = (period) => {
     setDeleteTarget(period);
+  };
+
+  const updateFormData = (changes) => {
+    setFormData((prev) => ({ ...prev, ...changes }));
+    setHasUnsavedChanges(true);
   };
 
   const handleCancelDelete = () => {
@@ -79,16 +158,28 @@ function Timetable() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addPeriod({
-        class_name: selectedClass,
-        subject_code: formData.subject_code,
-        day_of_week: formData.day_of_week,
-        start_time: ensureSecondsFormat(formData.start_time),
-        end_time: ensureSecondsFormat(formData.end_time),
-      });
-      setIsModalOpen(false);
+      if (editingPeriod) {
+        await updatePeriod({
+          timetable_id: editingPeriod.timetable_id,
+          subject_code: formData.subject_code,
+        });
+      } else {
+        await addPeriod({
+          class_name: selectedClass,
+          subject_code: formData.subject_code,
+          day_of_week: formData.day_of_week,
+          start_time: ensureSecondsFormat(formData.start_time),
+          end_time: ensureSecondsFormat(formData.end_time),
+        });
+      }
+      setHasUnsavedChanges(false);
+      handleCloseModal();
     } catch (err) {
-      alert(`Failed to add period: ${err.message}`);
+      alert(
+        editingPeriod
+          ? `Failed to update period: ${err.message}`
+          : `Failed to add period: ${err.message}`,
+      );
     }
   };
 
@@ -96,9 +187,16 @@ function Timetable() {
     <div className="timetable-page">
       <TimetableHeader
         selectedClass={selectedClass}
-        setSelectedClass={setSelectedClass}
+        setSelectedClass={(value) => {
+          setSelectedClass(value);
+          if (value) {
+            navigate(`/timetable/${encodeURIComponent(value)}`);
+          } else {
+            navigate("/timetable");
+          }
+        }}
         classesList={classesList}
-        onOpenAddModal={() => setIsModalOpen(true)}
+        onOpenAddModal={handleOpenAddModal}
       />
 
       <div className="timetable-card-container">
@@ -113,18 +211,22 @@ function Timetable() {
             schedule={schedule}
             isScheduleEmpty={isScheduleEmpty}
             onDelete={handleDelete}
+            onEdit={handleEdit}
           />
         )}
       </div>
 
       <TimetableModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
         onSubmit={handleSubmit}
         formData={formData}
-        setFormData={setFormData}
+        setFormData={updateFormData}
         selectedClass={selectedClass}
         daysOfWeek={daysOfWeek}
+        isEditMode={!!editingPeriod}
+        title={editingPeriod ? "Edit Period" : "Add Period"}
+        submitLabel={editingPeriod ? "Update Period" : "Save Period"}
       />
 
       {deleteTarget && (

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   FaGraduationCap,
   FaPlus,
@@ -11,6 +12,10 @@ import { classService } from "../../../services/classesServices";
 import "./classes.css";
 
 function Classes() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isCreateRoute = location.pathname === "/classes/create";
+
   const {
     classes,
     loading,
@@ -26,6 +31,27 @@ function Classes() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [classNameInput, setClassNameInput] = useState("");
   const [cameraSourceInput, setCameraSourceInput] = useState("0");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  const handleAddClass = () => {
+    navigate("/classes/create");
+  };
+
+  const handleCloseCreateForm = () => {
+    navigate("/classes");
+  };
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const handleDeleteRequest = (className) => {
     setDeleteTarget(className);
@@ -65,8 +91,12 @@ function Classes() {
       } else {
         await classService.createClass(classNameInput, cameraSourceInput);
       }
+      setHasUnsavedChanges(false);
       await refreshClasses();
       handleCloseModal();
+      if (isCreateRoute) {
+        navigate("/classes");
+      }
     } catch (err) {
       alert(`Error saving class: ${err.message}`);
     }
@@ -79,7 +109,7 @@ function Classes() {
           <h1 className="page-title">Classes</h1>
           <p className="page-subtitle">Class configuration and registry</p>
         </div>
-        <button className="btn-primary" onClick={() => handleOpenModal(null)}>
+        <button className="btn-primary" onClick={handleAddClass}>
           <FaPlus /> New Class
         </button>
       </div>
@@ -135,7 +165,7 @@ function Classes() {
         </div>
       )}
 
-      {isModalOpen && (
+      {(isCreateRoute || isModalOpen) && (
         <div className="modal-backdrop">
           <div className="modal-content">
             <div className="modal-header">
@@ -149,7 +179,10 @@ function Classes() {
                   required
                   placeholder="e.g. A-100"
                   value={classNameInput}
-                  onChange={(e) => setClassNameInput(e.target.value)}
+                  onChange={(e) => {
+                    setClassNameInput(e.target.value);
+                    setHasUnsavedChanges(true);
+                  }}
                 />
               </div>
 
@@ -160,7 +193,10 @@ function Classes() {
                   required
                   placeholder="e.g. 0 or rtsp://192.168.1.50:554/stream"
                   value={cameraSourceInput}
-                  onChange={(e) => setCameraSourceInput(e.target.value)}
+                  onChange={(e) => {
+                    setCameraSourceInput(e.target.value);
+                    setHasUnsavedChanges(true);
+                  }}
                 />
               </div>
 
@@ -168,7 +204,19 @@ function Classes() {
                 <button
                   type="button"
                   className="btn-cancel"
-                  onClick={handleCloseModal}
+                  onClick={() => {
+                    if (hasUnsavedChanges) {
+                      const proceed = window.confirm(
+                        "You have unsaved changes. Do you want to leave this form?",
+                      );
+                      if (!proceed) return;
+                    }
+                    setHasUnsavedChanges(false);
+                    handleCloseModal();
+                    if (isCreateRoute) {
+                      handleCloseCreateForm();
+                    }
+                  }}
                 >
                   Cancel
                 </button>
