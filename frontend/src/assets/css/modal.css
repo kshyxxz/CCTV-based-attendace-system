@@ -1,0 +1,94 @@
+
+.modal-backdrop,
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.modal-content,
+.modal-box {
+  width: min(100%, 480px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 24px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.22);
+  box-sizing: border-box;
+}
+
+.modal-content .modal-actions,
+.modal-box .modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.modal-content .btn-cancel,
+.modal-box .btn-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  min-height: 42px;
+  padding: 10px 16px;
+  color: #334155;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-weight: 600;
+  line-height: 1;
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal-content .btn-cancel:hover,
+.modal-box .btn-close:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.modal-content .btn-submit,
+.modal-box .btn-save {
+  min-height: 42px;
+  padding: 10px 16px;
+}
+
+@media (max-width: 560px) {
+  .modal-backdrop,
+  .modal-overlay {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .modal-content,
+  .modal-box {
+    max-height: calc(100dvh - 24px);
+    padding: 20px;
+  }
+
+  .modal-content .modal-actions,
+  .modal-box .modal-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .modal-content .btn-cancel,
+  .modal-content .btn-submit,
+  .modal-box .btn-close,
+  .modal-box .btn-save {
+    width: 100%;
+  }
+}
