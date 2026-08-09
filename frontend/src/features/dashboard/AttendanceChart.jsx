@@ -44,12 +44,12 @@ function AttendanceChart({ weeklyTrend = [] }) {
       {
         label: "Attendance Rate",
         data: labels.length ? chartDataPoints : [0, 0, 0, 0, 0],
-        borderColor: "#2563eb",
+        borderColor: "#2563EB",
         borderWidth: 2,
         backgroundColor: (context) => {
           const ctx = context.chart.ctx;
           const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-          gradient.addColorStop(0, "rgba(37, 99, 235, 0.25)");
+          gradient.addColorStop(0, "rgba(37, 99, 235, 0.16)");
           gradient.addColorStop(1, "rgba(37, 99, 235, 0.0)");
           return gradient;
         },
@@ -57,8 +57,8 @@ function AttendanceChart({ weeklyTrend = [] }) {
         fill: true,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: "#2563eb",
-        pointBorderColor: "#ffffff",
+        pointBackgroundColor: "#2563EB",
+        pointBorderColor: "#FFFFFF",
         pointBorderWidth: 2,
       },
     ],
@@ -83,7 +83,7 @@ function AttendanceChart({ weeklyTrend = [] }) {
           display: false,
         },
         ticks: {
-          color: "#6b7280",
+          color: "#64748B",
           font: { size: 12 },
         },
         offset: true, // Prevents points from sticking to the wall edges
@@ -93,12 +93,12 @@ function AttendanceChart({ weeklyTrend = [] }) {
         max: 100,
         ticks: {
           stepSize: 25,
-          color: "#6b7280",
+          color: "#64748B",
           font: { size: 12 },
           callback: (value) => `${value}%`,
         },
         grid: {
-          color: "#f3f4f6",
+          color: "#E2E8F0",
         },
       },
     },

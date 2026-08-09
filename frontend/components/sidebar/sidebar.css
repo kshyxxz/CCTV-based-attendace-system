@@ -1,10 +1,10 @@
 .sidebar-drawer {
-  background-color: #1a2332;
-  color: #ffffff;
+  background-color: var(--camera-bg);
+  color: var(--white);
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-right: 1px solid #243042;
+  border-right: 1px solid var(--camera-secondary);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 256px;
   flex-shrink: 0;
@@ -21,16 +21,16 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid #243042;
+  border-bottom: 1px solid var(--camera-secondary);
   height: 80px;
   box-sizing: border-box;
 }
 
 .sidebar-logo {
-  background-color: #2563eb;
+  background-color: var(--primary);
   padding: 8px;
   border-radius: 12px;
-  color: #ffffff;
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,7 +43,7 @@
   font-weight: 700;
   font-size: 1rem;
   letter-spacing: 0.02em;
-  color: #f1f5f9;
+  color: var(--white);
   line-height: 1.2;
 }
 
@@ -71,23 +71,23 @@
   text-align: left;
   position: relative;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: background-color var(--transition), color var(--transition), transform var(--transition);
   box-sizing: border-box;
 }
 
 .sidebar-link.inactive {
-  color: #94a3b8;
+  color: var(--muted);
 }
 
 .sidebar-link.inactive:hover {
-  background-color: rgba(36, 48, 66, 0.6);
-  color: #e2e8f0;
+  background-color: var(--camera-secondary);
+  color: var(--white);
 }
 
 .sidebar-link.active {
-  background-color: #2563eb;
-  color: #ffffff;
-  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+  background-color: var(--primary);
+  color: var(--white);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.24);
 }
 
 .sidebar-icon {
@@ -108,8 +108,8 @@
   left: 100%;
   margin-left: 16px;
   padding: 6px 12px;
-  background-color: #0f172a;
-  color: #e2e8f0;
+  background-color: var(--camera-secondary);
+  color: var(--white);
   font-size: 0.75rem;
   font-weight: 500;
   border-radius: 6px;
@@ -129,13 +129,13 @@
   position: absolute;
   top: 26px;
   right: -14px;
-  background-color: #ffffff;
+  background-color: var(--white);
   color: #334155;
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
   cursor: pointer;
   z-index: 50;
   display: flex;
@@ -144,8 +144,8 @@
 }
 
 .sidebar-toggle:hover {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--secondary);
+  color: var(--primary);
 }
 
 .sidebar-toggle-icon {

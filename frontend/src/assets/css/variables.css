@@ -1,18 +1,35 @@
 :root {
   --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-
-  --background: #f4f7fc;
-
-  --white: #ffffff;
-
-  --text: #111827;
-
-  --gray: #6b7280;
-
-  --border: #d1d5db;
-
-  --shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-
-  --radius: 12px;
+  --primary-hover: #1d4ed8;
+  --primary-dark: #1e40af;
+  --primary-light: #eff6ff;
+  --background: #f6f8fc;
+  --surface: #ffffff;
+  --white: var(--surface);
+  --text: #0f172a;
+  --body-text: #475569;
+  --gray: #64748b;
+  --muted: #94a3b8;
+  --border: #e2e8f0;
+  --secondary: #f8fafc;
+  --success: #10b981;
+  --success-light: #ecfdf5;
+  --success-dark: #047857;
+  --danger: #ef4444;
+  --danger-light: #fef2f2;
+  --danger-dark: #b91c1c;
+  --warning: #f59e0b;
+  --warning-light: #fffbeb;
+  --warning-dark: #b45309;
+  --info: #3b82f6;
+  --camera-bg: #0f172a;
+  --camera-secondary: #1e293b;
+  --camera-border: #334155;
+  --live: #22c55e;
+  --shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --shadow-hover: 0 6px 18px rgba(15, 23, 42, 0.07);
+  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.16);
+  --radius: 14px;
+  --button-radius: 8px;
+  --transition: 180ms ease;
 }
