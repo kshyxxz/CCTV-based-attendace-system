@@ -129,16 +129,16 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
   };
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2>{isEditMode ? "Edit Student Profile" : "Add New Student"}</h2>
+    <div className="modal-backdrop student-modal-backdrop" onMouseDown={handleCancel}>
+      <div className="modal-content student-form-modal" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="student-modal-header student-modal-header-centered">
+          <h2>{isEditMode ? "Edit student" : "Add student"}</h2>
         </div>
 
         <form onSubmit={handleFormSubmit} className="modal-form">
           {!isEditMode && <ImageUploader onImageSelect={handleImageSelect} />}
 
-          <div className="form-group">
+          <div className="form-group form-group-full">
             <label>Roll Number</label>
             <input
               type="text"
@@ -214,7 +214,7 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
             </div>
           </div>
 
-          <div className="form-group">
+          <div className="form-group form-group-full">
             <label>Address</label>
             <input
               type="text"
@@ -226,7 +226,7 @@ export default function StudentForm({ studentData, onClose, refreshStudents }) {
             />
           </div>
 
-          <div className="modal-actions">
+          <div className="modal-actions student-modal-actions">
             <button type="button" className="btn-cancel" onClick={handleCancel}>
               Cancel
             </button>

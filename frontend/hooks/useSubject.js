@@ -31,9 +31,9 @@ export function useSubjects() {
     setIsModalOpen(false);
   };
 
-  const handleDeleteSubject = async (subject_id) => {
+  const handleDeleteSubject = async (subject) => {
     try {
-      await subjectService.deleteSubject(subject_id);
+      await subjectService.deleteSubject(subject);
       await fetchSubjects();
     } catch (err) {
       alert(`Failed to delete subject: ${err.message}`);

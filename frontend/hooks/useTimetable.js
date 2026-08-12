@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { timetableService } from "../services/timetableServices";
 import { classService } from "../services/classesServices";
+import { subjectService } from "../services/subjectServices";
 
 export function useTimetable() {
   const [classesList, setClassesList] = useState([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [schedule, setSchedule] = useState({});
+  const [subjectCodes, setSubjectCodes] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -37,6 +39,25 @@ export function useTimetable() {
     fetchClasses();
   }, []);
 
+  // The timetable API returns subject names, while updates require subject codes.
+  useEffect(() => {
+    const fetchSubjectCodes = async () => {
+      try {
+        const data = await subjectService.getSubjects();
+        const subjects = Array.isArray(data) ? data : [];
+        setSubjectCodes(
+          Object.fromEntries(
+            subjects.map(({ subject_name, subject_code }) => [subject_name, subject_code]),
+          ),
+        );
+      } catch (err) {
+        console.error("Failed to load subject codes:", err);
+      }
+    };
+
+    fetchSubjectCodes();
+  }, []);
+
   // 2. Fetch timetable schedule whenever selectedClass changes
   const fetchTimetable = useCallback(async () => {
     if (!selectedClass) return;
@@ -44,14 +65,26 @@ export function useTimetable() {
       setLoading(true);
       setError(null);
       const data = await timetableService.getTimetableByClass(selectedClass);
-      setSchedule(data || {});
-    } catch (err) {
+      const timetable = data && !Array.isArray(data) && !data.error ? data : {};
+      setSchedule(
+        Object.fromEntries(
+          Object.entries(timetable).map(([day, periods]) => [
+            day,
+            periods.map((period) => ({
+              ...period,
+              day_of_week: day,
+              subject_code: subjectCodes[period.subject_name] || "",
+            })),
+          ]),
+        ),
+      );
+    } catch {
       // If a class has no schedule/periods created yet, keep schedule empty
       setSchedule({});
     } finally {
       setLoading(false);
     }
-  }, [selectedClass]);
+  }, [selectedClass, subjectCodes]);
 
   useEffect(() => {
     fetchTimetable();

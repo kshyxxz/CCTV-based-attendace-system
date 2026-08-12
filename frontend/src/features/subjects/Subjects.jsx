@@ -97,6 +97,7 @@ function Subjects() {
       if (editingSubject) {
         await subjectService.updateSubject({
           subject_id: editingSubject.subject_id,
+          subject_code: editingSubject.subject_code,
           new_subject_code: trimmedCode,
           new_subject_name: trimmedName,
         });
@@ -141,7 +142,7 @@ function Subjects() {
     if (!deleteTarget) return;
     setIsSubmitting(true);
     try {
-      await handleDeleteSubject(deleteTarget.subject_id);
+      await handleDeleteSubject(deleteTarget);
       setDeleteTarget(null);
     } catch (err) {
       alert(`Error deleting subject: ${err.message || "An error occurred"}`);

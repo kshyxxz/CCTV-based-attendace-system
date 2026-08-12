@@ -5,7 +5,7 @@ const API_URL = BASE_URL
   : "http://127.0.0.1:5000/timetable";
 
 export const timetableService = {
-  // GET /timetable/<class_name>/
+  // GET /timetable/<class_name>
   getTimetableByClass: async (className) => {
     const encodedClass = encodeURIComponent(className);
     return fetch(`${API_URL}/${encodedClass}`, {
@@ -30,10 +30,10 @@ export const timetableService = {
     }).then(handleResponse);
   },
 
-  // PUT /timetable/<class_name>/
+  // PUT /timetable/<class_name>
   updatePeriod: async (className, payload) => {
     const encodedClass = encodeURIComponent(className);
-    return fetch(`${API_URL}/${encodedClass}/`, {
+    return fetch(`${API_URL}/${encodedClass}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -43,7 +43,7 @@ export const timetableService = {
     }).then(handleResponse);
   },
 
-  // DELETE /timetable/<class_name>/
+  // DELETE /timetable/<class_name>
   deletePeriod: async (className, timetableId) => {
     const encodedClass = encodeURIComponent(className);
     return fetch(`${API_URL}/${encodedClass}`, {

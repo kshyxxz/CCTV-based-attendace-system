@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaCheckCircle, FaIdCard, FaMapMarkerAlt, FaPhoneAlt } from "react-icons/fa";
 import { studentService } from "../../../services/studentServices";
 
 export default function StudentDetailModal({ rollno, onClose }) {
@@ -29,10 +30,10 @@ export default function StudentDetailModal({ rollno, onClose }) {
   const attendanceStats = studentDetails?.attendance_stats || [];
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>Student Details</h2>
+    <div className="modal-backdrop student-modal-backdrop" onMouseDown={onClose}>
+      <div className="modal-content student-detail-modal" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="student-modal-header student-modal-header-centered">
+          <h2>Student detail</h2>
         </div>
 
         {loading && <div className="status-message">Loading details...</div>}
@@ -42,35 +43,25 @@ export default function StudentDetailModal({ rollno, onClose }) {
 
         {!loading && !error && studentDetails && (
           <div className="student-detail-body">
-            <div className="detail-group">
-              <h3>{studentDetails.name}</h3>
-              <p className="text-muted">
-                <strong>Roll No:</strong> {studentDetails.rollno}
-              </p>
-              <p className="text-muted">
-                <strong>Class Name:</strong> {studentDetails.class_name}
-              </p>
-              <p className="text-muted">
-                <strong>Address:</strong> {studentDetails.address || "N/A"}
-              </p>
-              <p className="text-muted">
-                <strong>Phone:</strong> {studentDetails.phone || "N/A"}
-              </p>
-              <p className="text-muted">
-                <strong>Embedding:</strong>{" "}
-                <span
-                  className={`badge ${studentDetails.embedding ? "completed" : "pending"}`}
-                >
-                  <span className="dot"></span>{" "}
-                  {studentDetails.embedding ? "Ready" : "Pending"}
+            <div className="student-profile-summary">
+              <div className="student-avatar">{studentDetails.name?.charAt(0) || "S"}</div>
+              <div>
+                <h3>{studentDetails.name}</h3>
+                <p>{studentDetails.rollno}</p>
+                <span className={`badge ${studentDetails.embedding ? "completed" : "pending"}`}>
+                  <FaCheckCircle /> {studentDetails.embedding ? "Face profile ready" : "Face profile pending"}
                 </span>
-              </p>
+              </div>
             </div>
 
-            <hr className="divider" />
+            <div className="student-contact-grid">
+              <div><FaIdCard /><span>Class</span><strong>{studentDetails.class_name || "Unassigned"}</strong></div>
+              <div><FaPhoneAlt /><span>Phone</span><strong>{studentDetails.phone || "N/A"}</strong></div>
+              <div className="student-contact-wide"><FaMapMarkerAlt /><span>Address</span><strong>{studentDetails.address || "N/A"}</strong></div>
+            </div>
 
-            <div className="detail-group">
-              <h4>Attendance Stats</h4>
+            <div className="detail-group attendance-stats-section">
+              <div className="student-section-heading"><h4>Attendance by subject</h4><span>{attendanceStats.length} subjects</span></div>
               {attendanceStats.length > 0 ? (
                 <ul className="attendance-list">
                   {attendanceStats.map((stat, idx) => (
@@ -87,7 +78,7 @@ export default function StudentDetailModal({ rollno, onClose }) {
           </div>
         )}
 
-        <div className="modal-actions" style={{ marginTop: "20px" }}>
+        <div className="modal-actions student-modal-actions">
           <button className="btn-cancel" onClick={onClose}>
             Close
           </button>

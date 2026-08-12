@@ -62,17 +62,18 @@ html {
 
 .controls-left {
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
   flex: 1 1 auto;
-  flex-wrap: wrap;
 }
 
 .select-and-source-group {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 200px;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
 }
 
 .control-select-group {
@@ -83,7 +84,8 @@ html {
   border: 1px solid var(--border-element);
   padding: 6px 12px;
   border-radius: 8px;
-  width: 100%;
+  width: min(200px, 100%);
+  flex: 0 1 200px;
 }
 
 .control-icon {
@@ -120,7 +122,7 @@ html {
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .camera-source-status {
@@ -134,7 +136,11 @@ html {
   background-color: #f8fafc;
   color: var(--text-secondary-color);
   border: 1px solid var(--border-element);
-  width: fit-content;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .camera-source-status.success {
@@ -168,6 +174,17 @@ html {
   cursor: pointer;
   transition: all 0.2s;
   height: 38px;
+}
+
+.controls-left .btn-action-trigger {
+  width: 100%;
+  min-height: 48px;
+}
+
+@media (max-width: 560px) {
+  .select-and-source-group { align-items: stretch; flex-direction: column; }
+  .control-select-group { width: 100%; flex-basis: auto; }
+  .source-status-wrapper { width: 100%; }
 }
 
 .btn-start {

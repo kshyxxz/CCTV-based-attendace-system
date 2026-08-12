@@ -17,11 +17,12 @@ function CameraPanel({
   videoRef,
   detections = [],
 }) {
+  const sourceLabel = String(cameraSource).trim() === "0" ? "Webcam" : cameraSource;
+
   return (
     <div className="video-panel">
       <div className="controls-panel">
         <div className="controls-left">
-          {/* Stack select dropdown and source status vertically */}
           <div className="select-and-source-group">
             <div className="control-select-group">
               <select
@@ -43,13 +44,12 @@ function CameraPanel({
               </select>
             </div>
 
-            {/* Camera source now directly under the select element */}
             <div className="source-status-wrapper">
               {cameraSourceLoading ? (
                 <div className="camera-source-status">Loading...</div>
               ) : cameraSource ? (
                 <div className="camera-source-status success">
-                  Source: {cameraSource}
+                  Source: {sourceLabel}
                 </div>
               ) : (
                 <div className="camera-source-status warning">
