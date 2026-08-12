@@ -8,7 +8,7 @@ function DashboardCards({ today }) {
 
   return (
     <section className="cards">
-      <div className="card">
+      <div className="card card-total">
         <div>
           <h3>Total Expected</h3>
           <h1>{total}</h1>
@@ -16,7 +16,7 @@ function DashboardCards({ today }) {
         <FaUsers />
       </div>
 
-      <div className="card">
+      <div className="card card-present">
         <div>
           <h3>Present Today</h3>
           <h1>{present}</h1>
@@ -24,7 +24,7 @@ function DashboardCards({ today }) {
         <FaUserCheck />
       </div>
 
-      <div className="card">
+      <div className="card card-absent">
         <div>
           <h3>Absent Today</h3>
           <h1>{absent}</h1>
@@ -32,7 +32,7 @@ function DashboardCards({ today }) {
         <FaUserTimes />
       </div>
 
-      <div className="card">
+      <div className="card card-rate">
         <div>
           <h3>Attendance Rate</h3>
           <h1>{attendanceRate}</h1>
