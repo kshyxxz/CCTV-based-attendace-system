@@ -42,7 +42,7 @@ def add_subject():
 		return jsonify({"error": f"{e}"})
 
 @subject_bp.route("/<subject_code>/update", methods=["PUT"])
-def change_subject():
+def change_subject(subject_code):
 	db = SessionLocal()
 
 	try:
@@ -61,7 +61,7 @@ def change_subject():
 		return jsonify({"error": f"{e}"})
 
 @subject_bp.route("/<subject_code>/delete", methods=["DELETE"])
-def delete_subjects():
+def delete_subjects(subject_code):
 	db = SessionLocal()
 
 	try:
