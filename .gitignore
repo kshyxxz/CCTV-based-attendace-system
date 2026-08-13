@@ -17,6 +17,5 @@ tests
 
 db.json
 my_packages.txt
-
 package.json
 package-lock.json
