@@ -53,100 +53,114 @@ export function TimetableGrid({
     return matchedKey ? schedule[matchedKey] : [];
   };
 
+  // Track active rowSpans per day across time slots
+  const activeSpans = {};
+  daysOfWeek.forEach((day) => {
+    activeSpans[day] = 0;
+  });
+
   return (
     <div className="table-responsive">
       <table className="routine-table">
         <thead>
           <tr>
-            <th className="day-header-th">DAY \ TIME</th>
-            {timeSlots.map((slot) => (
-              <th key={slot.rawKey} className="time-header-th">
-                {slot.rawKey}
+            <th className="day-header-th">TIME \ DAY</th>
+            {daysOfWeek.map((day) => (
+              <th key={day} className="time-header-th">
+                {day}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {daysOfWeek.map((day) => {
-            const dayPeriods = getDayPeriods(day);
-            let slotIndex = 0;
-            const tableCells = [];
-
-            while (slotIndex < timeSlots.length) {
-              const currentSlot = timeSlots[slotIndex];
-              const slotStartMins = parseTimeToMinutes(currentSlot.startRaw);
-              const slotEndMins = parseTimeToMinutes(currentSlot.endRaw);
-
-              // Find a period that starts in this specific slot window
-              const matchingPeriod = dayPeriods.find((p) => {
-                const pStartMins = parseTimeToMinutes(p.start_time);
-                // Strict match: Must start exactly at or within this slot boundary
-                return pStartMins >= slotStartMins && pStartMins < slotEndMins;
-              });
-
-              if (matchingPeriod) {
-                const pEndMins = parseTimeToMinutes(matchingPeriod.end_time);
-
-                // Calculate how many standard slots this class covers
-                let span = 0;
-                for (let k = slotIndex; k < timeSlots.length; k++) {
-                  const checkStart = parseTimeToMinutes(timeSlots[k].startRaw);
-                  if (checkStart < pEndMins) {
-                    span++;
-                  } else {
-                    break;
-                  }
-                }
-
-                span = Math.max(1, span);
-
-                tableCells.push(
-                  <td
-                    key={`${day}-${currentSlot.rawKey}-${slotIndex}`}
-                    colSpan={span}
-                    className="routine-td filled-td"
-                  >
-                    <div className="subject-card">
-                      <span className="subject-title">
-                        {matchingPeriod.subject_name ||
-                          matchingPeriod.subject_code ||
-                          matchingPeriod.subject}
-                      </span>
-                      <button
-                        className="btn-delete-small"
-                        title="Edit period"
-                        onClick={() => onEdit(matchingPeriod)}
-                      >
-                        <FaPencilAlt />
-                      </button>
-                      <button
-                        className="btn-delete-small"
-                        title="Delete period"
-                        onClick={() => onDelete(matchingPeriod)}
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  </td>,
-                );
-
-                slotIndex += span;
-              } else {
-                // Render empty cell slot
-                tableCells.push(
-                  <td
-                    key={`${day}-${currentSlot.rawKey}-${slotIndex}`}
-                    className="routine-td empty-td"
-                  ></td>,
-                );
-                slotIndex++;
-              }
-            }
+          {timeSlots.map((slot, slotIdx) => {
+            const currentStartMins = parseTimeToMinutes(slot.startRaw);
+            const currentEndMins = parseTimeToMinutes(slot.endRaw);
 
             return (
-              <tr key={day}>
-                <td className="day-name-td">{day}</td>
-                {tableCells}
+              <tr key={slot.rawKey}>
+                <td className="day-name-td">{slot.rawKey}</td>
+                {daysOfWeek.map((day) => {
+                  // Decrement span tracker if cell is spanned from a previous row
+                  if (activeSpans[day] > 0) {
+                    activeSpans[day]--;
+                    return null;
+                  }
+
+                  const dayPeriods = getDayPeriods(day);
+                  const matchingPeriod = dayPeriods.find((p) => {
+                    const pStartMins = parseTimeToMinutes(p.start_time);
+                    return (
+                      pStartMins >= currentStartMins &&
+                      pStartMins < currentEndMins
+                    );
+                  });
+
+                  if (matchingPeriod) {
+                    const pEndMins = parseTimeToMinutes(
+                      matchingPeriod.end_time,
+                    );
+
+                    // Calculate rowSpan across consecutive time slots
+                    let span = 0;
+                    for (let k = slotIdx; k < timeSlots.length; k++) {
+                      const checkStart = parseTimeToMinutes(
+                        timeSlots[k].startRaw,
+                      );
+                      if (checkStart < pEndMins) {
+                        span++;
+                      } else {
+                        break;
+                      }
+                    }
+
+                    span = Math.max(1, span);
+                    if (span > 1) {
+                      activeSpans[day] = span - 1;
+                    }
+
+                    return (
+                      <td
+                        key={`${day}-${slot.rawKey}`}
+                        rowSpan={span}
+                        className="routine-td filled-td"
+                      >
+                        <div className="subject-card">
+                          <div className="subject-content">
+                            <span className="subject-title">
+                              {matchingPeriod.subject_name ||
+                                matchingPeriod.subject_code ||
+                                matchingPeriod.subject}
+                            </span>
+                          </div>
+                          <div className="card-actions">
+                            <button
+                              className="btn-delete-small"
+                              title="Edit period"
+                              onClick={() => onEdit(matchingPeriod)}
+                            >
+                              <FaPencilAlt />
+                            </button>
+                            <button
+                              className="btn-delete-small"
+                              title="Delete period"
+                              onClick={() => onDelete(matchingPeriod)}
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    );
+                  }
+
+                  return (
+                    <td
+                      key={`${day}-${slot.rawKey}`}
+                      className="routine-td empty-td"
+                    ></td>
+                  );
+                })}
               </tr>
             );
           })}

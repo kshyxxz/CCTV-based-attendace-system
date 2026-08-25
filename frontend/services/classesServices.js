@@ -45,17 +45,9 @@ export const classService = {
     }).then(handleResponse);
   },
 
-  // DELETE /classes/<class_id>/camera-source -> Remove camera source mapping
-  deleteCameraSource: async (classId) => {
-    return fetch(`${API_URL}/${encodeURIComponent(classId)}/camera-source`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    }).then(handleResponse);
-  },
-
-  // POST /classes/ -> Create class
+  // POST /classes/create -> Create class
   createClass: async (className, cameraSource = "0") => {
-    return fetch(`${API_URL}/`, {
+    return fetch(`${API_URL}/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -65,7 +57,7 @@ export const classService = {
     }).then(handleResponse);
   },
 
-  // PUT /classes/ -> Update class name and optionally its camera source
+  // PUT /classes/<class_name>/update -> Update a class
   updateClass: async (oldClassName, newClassName, cameraSource) => {
     const payload = {
       class_name: oldClassName,
@@ -76,16 +68,16 @@ export const classService = {
       payload.camera_source = cameraSource || "0";
     }
 
-    return fetch(`${API_URL}/`, {
+    return fetch(`${API_URL}/${encodeURIComponent(oldClassName)}/update`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     }).then(handleResponse);
   },
 
-  // DELETE /classes/ -> Delete class
+  // DELETE /classes/<class_name>/delete -> Delete class
   deleteClass: async (className) => {
-    return fetch(`${API_URL}/`, {
+    return fetch(`${API_URL}/${encodeURIComponent(className)}/delete`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ class_name: className }),

@@ -13,9 +13,9 @@ export const subjectService = {
     }).then(handleResponse);
   },
 
-  // POST / -> Create subject
+  // POST /subjects/create -> Create subject
   createSubject: async ({ subject_name, subject_code }) => {
-    return fetch(`${API_URL}/`, {
+    return fetch(`${API_URL}/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -25,9 +25,14 @@ export const subjectService = {
     }).then(handleResponse);
   },
 
-  // PUT / -> Update subject
-  updateSubject: async ({ subject_id, new_subject_code, new_subject_name }) => {
-    return fetch(`${API_URL}/`, {
+  // PUT /subjects/<subject_code>/update -> Update subject
+  updateSubject: async ({
+    subject_id,
+    subject_code,
+    new_subject_code,
+    new_subject_name,
+  }) => {
+    return fetch(`${API_URL}/${encodeURIComponent(subject_code)}/update`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -38,9 +43,9 @@ export const subjectService = {
     }).then(handleResponse);
   },
 
-  // DELETE / -> Delete subject
-  deleteSubject: async (subject_id) => {
-    return fetch(`${API_URL}/`, {
+  // DELETE /subjects/<subject_code>/delete -> Delete subject
+  deleteSubject: async ({ subject_id, subject_code }) => {
+    return fetch(`${API_URL}/${encodeURIComponent(subject_code)}/delete`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ subject_id: String(subject_id) }),
