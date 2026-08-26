@@ -5,7 +5,7 @@ from api.recognition import recognition_bp
 from services.recognition_service import process_frame
 from vision.camera import load_camera, get_capture, release_camera
 from database.database import get_db
-from config import CAMERA_SOURCE
+from config import CAMERA_SOURCE, FRAME_SKIP
 
 recognition_bp.cap = None
 recognition_bp.streaming = False
@@ -57,13 +57,18 @@ def generate_frames():
             with recognition_bp.stream_lock:
                 if not recognition_bp.streaming:
                     break
-                ret, frame = get_capture(recognition_bp.cap)
-
+                cap = recognition_bp.cap
                 active_class_name = getattr(recognition_bp, "active_class_name", "") or ""
+                active_class_id = getattr(recognition_bp, "active_class_id", None)
+
+            if cap is None:
+                break
+
+            ret, frame = get_capture(cap)
 
             if not ret or frame is None:
-                print("[VIDEO_FEED] Stream ended or frame read failed.")
-                break
+                time.sleep(0.01)
+                continue
 
             current_time = time.time()
             dt = current_time - last_time
@@ -72,28 +77,29 @@ def generate_frames():
                 instant_fps = 1.0 / dt
                 fps = instant_fps if fps == 0.0 else (0.9 * fps + 0.1 * instant_fps)
 
-            # Run face recognition on each frame
-            result = process_frame(
-                frame.copy(),
-                db,
-                class_id=getattr(recognition_bp, "active_class_id", None),
-                class_name=active_class_name,
-            )
-            cached_detections = result.get("detections", [])
-            
-            new_logs = result.get("logs", [])
-            detected_count = len(cached_detections)
-            recognized_count = sum(1 for d in cached_detections if d.get("recognized"))
-            unknown_count = detected_count - recognized_count
+            # Run face recognition only on every N-th frame (using FRAME_SKIP)
+            if frame_count % FRAME_SKIP == 0:
+                result = process_frame(
+                    frame.copy(),
+                    db,
+                    class_id=active_class_id,
+                    class_name=active_class_name,
+                )
+                cached_detections = result.get("detections", [])
+                
+                new_logs = result.get("logs", [])
+                detected_count = len(cached_detections)
+                recognized_count = sum(1 for d in cached_detections if d.get("recognized"))
+                unknown_count = detected_count - recognized_count
 
-            with recognition_bp.stream_lock:
-                if new_logs:
-                    recognition_bp.latest_logs = (new_logs + recognition_bp.latest_logs)[:100]
-                recognition_bp.latest_stats.update({
-                    "detected": detected_count,
-                    "recognized": recognized_count,
-                    "unknown": unknown_count,
-                })
+                with recognition_bp.stream_lock:
+                    if new_logs:
+                        recognition_bp.latest_logs = (new_logs + recognition_bp.latest_logs)[:100]
+                    recognition_bp.latest_stats.update({
+                        "detected": detected_count,
+                        "recognized": recognized_count,
+                        "unknown": unknown_count,
+                    })
 
             draw_detections(frame, cached_detections)
 
