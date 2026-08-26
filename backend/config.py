@@ -15,7 +15,7 @@ CAMERA_SOURCE_RAW = os.getenv("CAMERA_SOURCE", "0")
 CAMERA_SOURCE = int(CAMERA_SOURCE_RAW) if CAMERA_SOURCE_RAW.isdigit() else CAMERA_SOURCE_RAW
 CAMERA_WIDTH = int(os.getenv("CAMERA_WIDTH", 640))
 CAMERA_HEIGHT = int(os.getenv("CAMERA_HEIGHT", 480))
-CAMERA_FPS = int(os.getenv("CAMERA_FPS", 30))
+CAMERA_FPS = int(os.getenv("CAMERA_FPS", 25))
 
 FACE_SIZE = (160, 160)
 FRAME_SKIP = int(os.getenv("FRAME_SKIP", 5))

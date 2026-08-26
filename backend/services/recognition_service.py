@@ -19,6 +19,9 @@ generator = load_facenet()
 
 # Global memory cache tracking recent detections: { rollno: timestamp }
 RECENT_DETECTIONS = {}
+EMBEDDING_CACHE = {}  # { class_id: (timestamp, roll_numbers, stored_embeddings) }
+STUDENT_CACHE = {}    # { rollno: (timestamp, full_name) }
+CACHE_EXPIRY_SECONDS = 10.0
 
 
 def decode_image(base64_str):
@@ -36,7 +39,7 @@ def decode_image(base64_str):
         return None
 
 def process_frame(img, db, class_id=None, class_name=""):
-    global RECENT_DETECTIONS
+    global RECENT_DETECTIONS, EMBEDDING_CACHE, STUDENT_CACHE
 
     if img is None:
         return {"detections": [], "logs": []}
@@ -46,20 +49,57 @@ def process_frame(img, db, class_id=None, class_name=""):
 
     current_timestamp = time.time()
 
-    # 1. Fetch embeddings
-    loaded_records = get_all_embeddings(db)
-    if class_id is not None:
-        class_rolls = {
-            student.rollno
-            for student in db.query(Student).filter(Student.class_id == class_id).all()
-        }
-        loaded_records = [record for record in loaded_records if record.rollno in class_rolls]
+    # 1. Fetch embeddings (with memory cache to avoid DB query on every frame)
+    cached_data = EMBEDDING_CACHE.get(class_id)
+    if cached_data and (current_timestamp - cached_data[0] < CACHE_EXPIRY_SECONDS):
+        roll_numbers, stored_embeddings = cached_data[1], cached_data[2]
+    else:
+        loaded_records = get_all_embeddings(db)
+        if class_id is not None:
+            class_rolls = {
+                student.rollno
+                for student in db.query(Student).filter(Student.class_id == class_id).all()
+            }
+            loaded_records = [record for record in loaded_records if record.rollno in class_rolls]
 
-    roll_numbers = [item.rollno for item in loaded_records]
-    stored_embeddings = [item.embedding for item in loaded_records]
+        roll_numbers = [item.rollno for item in loaded_records]
+        stored_embeddings = [item.embedding for item in loaded_records]
+        EMBEDDING_CACHE[class_id] = (current_timestamp, roll_numbers, stored_embeddings)
 
     # 2. Detect & Crop faces
-    faces = [f for f in detect_faces(detector, img) if f.get("confidence", 0) >= FACE_CONFIDENCE]
+    # Downscale frame for face detection to significantly speed up MTCNN processing
+    h, w = img.shape[:2]
+    target_width = 480  # Balanced resolution for CPU-based detection
+    scale = target_width / w
+    if scale < 1.0:
+        img_small = cv2.resize(img, (target_width, int(h * scale)))
+    else:
+        img_small = img
+        scale = 1.0
+
+    raw_faces = detect_faces(detector, img_small)
+    
+    # Scale bounding boxes back up to original frame coordinates
+    faces = []
+    for f in raw_faces:
+        if f.get("confidence", 0) >= FACE_CONFIDENCE:
+            bx, by, bw, bh = f["box"]
+            scaled_box = [
+                int(bx / scale),
+                int(by / scale),
+                int(bw / scale),
+                int(bh / scale)
+            ]
+            scaled_box[0] = max(0, scaled_box[0])
+            scaled_box[1] = max(0, scaled_box[1])
+            scaled_box[2] = min(w - scaled_box[0], scaled_box[2])
+            scaled_box[3] = min(h - scaled_box[1], scaled_box[3])
+            
+            faces.append({
+                "box": scaled_box,
+                "confidence": f["confidence"]
+            })
+
     cropped_faces = [extract_face(img, f["box"]) for f in faces if extract_face(img, f["box"]) is not None]
     valid_boxes = [f["box"] for f in faces]
 
@@ -82,13 +122,17 @@ def process_frame(img, db, class_id=None, class_name=""):
             roll = roll_numbers[index]
             recognized = True
 
-            student = get_student(db, roll)
-    
-            # 2. Extract string safely so Flask doesn't throw a JSON serialization error
-            if student and student.fname:
-                full_name = f"{student.fname} {student.lname or ''}".strip()
+            # Use student details cache to avoid DB lookup on every face
+            cached_student = STUDENT_CACHE.get(roll)
+            if cached_student and (current_timestamp - cached_student[0] < CACHE_EXPIRY_SECONDS):
+                full_name = cached_student[1]
             else:
-                full_name = roll
+                student = get_student(db, roll)
+                if student and student.fname:
+                    full_name = f"{student.fname} {student.lname or ''}".strip()
+                else:
+                    full_name = roll
+                STUDENT_CACHE[roll] = (current_timestamp, full_name)
 
             # Check cooldown against global dictionary
             last_seen = RECENT_DETECTIONS.get(roll, 0)
@@ -107,11 +151,11 @@ def process_frame(img, db, class_id=None, class_name=""):
             else:
                 print(f"[COOLDOWN ACTIVE] {roll} skipped. {int(elapsed)}s / {LOG_COOLDOWN_SECONDS}s passed.")
         else:
-            roll, name, recognized = "Unknown", "Unknown", False
+            roll, full_name, recognized = "Unknown", "Unknown", False
 
         detections.append({
             "rollno": roll,
-            "name": roll,
+            "name": full_name,
             "recognized": recognized,
             "similarity": float(similarity) if similarity else 0.0,
             "box": box
